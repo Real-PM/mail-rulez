@@ -95,9 +95,11 @@ EXAMPLES:
 
 ACCESS:
     Once started, access Mail-Rulez at:
-    - Web Interface: http://localhost:5001
-    - Health Check: http://localhost:5001/health
-    - API Status: http://localhost:5001/api/status
+    - Web Interface: http://localhost:5001 (or http://[host-ip]:5001)
+    - Health Check: http://localhost:5001/health (or http://[host-ip]:5001/health)
+    - API Status: http://localhost:5001/api/status (or http://[host-ip]:5001/api/status)
+    
+    Note: Uses host networking for better Docker compatibility
 
 EOF
 }
@@ -358,8 +360,9 @@ start_container() {
             "-v $SANDBOX_DIR/backups:/app/backups"
         )
         
-        # Port mapping
-        PORT_MAP="-p $PORT:5001"
+        # Network configuration - use host networking for better compatibility
+        # This avoids Docker bridge networking issues that can cause container restart loops
+        NETWORK_CONFIG="--network host"
         
         # Container name and restart policy
         CONTAINER_OPTS="--name $CONTAINER_NAME --restart unless-stopped"
@@ -368,7 +371,7 @@ start_container() {
         HEALTH_CHECK="--health-cmd 'curl -f http://localhost:5001/health || exit 1' --health-interval=30s --health-timeout=10s --health-retries=3"
         
         # Execute docker run
-        eval "$DOCKER_CMD $CONTAINER_OPTS $PORT_MAP ${ENV_VARS[*]} ${VOLUMES[*]} $HEALTH_CHECK $IMAGE_NAME"
+        eval "$DOCKER_CMD $CONTAINER_OPTS $NETWORK_CONFIG ${ENV_VARS[*]} ${VOLUMES[*]} $HEALTH_CHECK $IMAGE_NAME"
     fi
     
     # Wait for container to be ready
