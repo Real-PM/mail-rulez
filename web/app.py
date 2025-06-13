@@ -1,0 +1,123 @@
+"""
+Mail-Rulez Web Interface
+
+Flask application for managing email processing rules, accounts, and monitoring.
+Integrates with the existing Mail-Rulez security and configuration systems.
+"""
+
+import os
+import sys
+from pathlib import Path
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask_wtf.csrf import CSRFProtect
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from config import get_config
+from security import get_security_manager, SessionManager
+from logging_config import setup_for_environment, get_logger
+
+
+def create_app(config_dir=None, testing=False):
+    """Create and configure Flask application"""
+    app = Flask(__name__)
+    
+    # Setup logging first
+    log_config = setup_for_environment()
+    app.log_config = log_config
+    
+    # Configure Flask
+    app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev-key-change-in-production')
+    app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # 1 hour
+    app.config['TESTING'] = testing
+    
+    # Initialize CSRF protection
+    csrf = CSRFProtect(app)
+    
+    # Initialize Mail-Rulez components
+    mail_config = get_config(base_dir=config_dir)
+    security_manager = get_security_manager()
+    session_manager = SessionManager(security_manager)
+    
+    # Store managers in app context for access in routes
+    app.mail_config = mail_config
+    app.security_manager = security_manager
+    app.session_manager = session_manager
+    
+    # Register error handlers
+    @app.errorhandler(404)
+    def not_found(error):
+        return render_template('errors/404.html'), 404
+    
+    @app.errorhandler(500)
+    def internal_error(error):
+        return render_template('errors/500.html'), 500
+    
+    @app.errorhandler(403)
+    def forbidden(error):
+        return render_template('errors/403.html'), 403
+    
+    # Context processor to make common data available to all templates
+    @app.context_processor
+    def inject_globals():
+        return {
+            'app_name': 'Mail-Rulez',
+            'version': '2.0.0',
+            'current_user': get_current_user(),
+            'account_count': len(app.mail_config.accounts),
+            'lists_dir': str(app.mail_config.lists_dir)
+        }
+    
+    # Helper function to get current user from session
+    def get_current_user():
+        session_token = session.get('session_token')
+        if session_token:
+            user_session = app.session_manager.get_session(session_token)
+            if user_session:
+                return user_session.get('username')
+        return None
+    
+    # Make get_current_user available to routes
+    app.get_current_user = get_current_user
+    
+    # Register blueprints
+    from web.routes.auth import auth_bp
+    from web.routes.dashboard import dashboard_bp
+    from web.routes.accounts import accounts_bp
+    from web.routes.lists import lists_bp
+    from web.routes.rules import rules_bp
+    from web.routes.services import services_bp
+    from web.routes.logs import logs_bp
+    
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(dashboard_bp, url_prefix='/')
+    app.register_blueprint(accounts_bp, url_prefix='/accounts')
+    app.register_blueprint(lists_bp, url_prefix='/lists')
+    app.register_blueprint(rules_bp, url_prefix='/rules')
+    app.register_blueprint(services_bp)
+    app.register_blueprint(logs_bp)
+    
+    # Exempt API services from CSRF protection
+    csrf.exempt(services_bp)
+    
+    # Root route
+    @app.route('/')
+    def index():
+        if get_current_user():
+            return redirect(url_for('dashboard.overview'))
+        return redirect(url_for('auth.login'))
+    
+    return app
+
+
+def run_app():
+    """Run the Flask application in development mode"""
+    import os
+    app = create_app()
+    port = int(os.environ.get('FLASK_PORT', 5001))
+    app.run(debug=True, host='0.0.0.0', port=port)
+
+
+if __name__ == '__main__':
+    run_app()

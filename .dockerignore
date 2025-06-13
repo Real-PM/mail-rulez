@@ -1,0 +1,100 @@
+# Mail-Rulez Docker Build Context Optimization
+# Exclude unnecessary files to reduce build context size and improve security
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Testing and development
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+
+# Logs (will be generated in container)
+*.log
+logs/
+*.log.*
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Documentation and development files
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
+docs/
+*.md
+!CLAUDE.md
+
+# Configuration files (handled via environment/volumes)
+config.ini
+secure_config.json
+.master_key
+.env
+.env.*
+
+# Runtime data (handled via volumes)
+data/
+lists/
+backups/
+
+# Development and testing artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+test-results/
+test-reports/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Docker files (exclude from build context to prevent recursive copying)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Backup files
+*.bak
+*.backup
+*.old

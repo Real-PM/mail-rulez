@@ -1,0 +1,116 @@
+# Docker Compose for Mail-Rulez Testing
+# Optimized configuration for running automated tests in CI/CD environments
+
+version: '3.8'
+
+services:
+  mail-rulez-test:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.test
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    container_name: mail-rulez-test
+    
+    # Test environment configuration
+    environment:
+      # Flask testing configuration
+      - FLASK_ENV=testing
+      - FLASK_PORT=5001
+      - FLASK_SECRET_KEY=test-secret-key-not-for-production
+      
+      # Test-specific paths
+      - MAIL_RULEZ_APP_DIR=/app
+      - MAIL_RULEZ_LOG_DIR=/app/test-logs
+      - MAIL_RULEZ_DATA_DIR=/app/test-data
+      - MAIL_RULEZ_LISTS_DIR=/app/test-lists
+      - MAIL_RULEZ_CONFIG_DIR=/app/test-config
+      
+      # Logging configuration for testing
+      - MAIL_RULEZ_LOG_LEVEL=DEBUG
+      - MAIL_RULEZ_JSON_LOGS=false
+      - MAIL_RULEZ_ENABLE_LOG_ROTATION=false
+      
+      # Test-specific security settings
+      - MAIL_RULEZ_MASTER_KEY=test-master-key-not-for-production
+      - MAIL_RULEZ_STRICT_VALIDATION=false
+      
+      # Skip optional features during testing
+      - MAIL_RULEZ_SKIP_NETWORK_CHECK=true
+      
+      # Pytest configuration
+      - PYTEST_CURRENT_TEST=true
+      - PYTHONPATH=/app
+    
+    # Volume mounts for test results
+    volumes:
+      # Test results output
+      - type: bind
+        source: ${TEST_RESULTS_DIR:-./test-results}
+        target: /app/test-results
+        bind:
+          create_host_path: true
+      
+      # Optional: Mount source code for live testing during development
+      - type: bind
+        source: ${SOURCE_DIR:-../}
+        target: /app/src
+        read_only: true
+        bind:
+          create_host_path: false
+    
+    # Resource limits for testing
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.25'
+    
+    # Health check for test container
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 5s
+      retries: 1
+      start_period: 10s
+    
+    # Logging configuration for tests
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+        labels: "service=mail-rulez-test"
+    
+    # Network configuration
+    networks:
+      - test-network
+
+  # Test database service (if needed in future)
+  # test-db:
+  #   image: postgres:15-alpine
+  #   container_name: mail-rulez-test-db
+  #   environment:
+  #     - POSTGRES_DB=mail_rulez_test
+  #     - POSTGRES_USER=test_user
+  #     - POSTGRES_PASSWORD=test_password
+  #   volumes:
+  #     - test_db_data:/var/lib/postgresql/data
+  #   networks:
+  #     - test-network
+  #   profiles:
+  #     - database
+
+# Test-specific volumes
+volumes:
+  test_db_data:
+    driver: local
+
+# Test network
+networks:
+  test-network:
+    name: mail-rulez-test-network
+    driver: bridge

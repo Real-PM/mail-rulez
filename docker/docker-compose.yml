@@ -1,0 +1,206 @@
+# Docker Compose for Mail-Rulez
+# Production-ready configuration with logging, monitoring, and persistence
+
+version: '3.8'
+
+services:
+  mail-rulez:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      target: production
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    container_name: mail-rulez-app
+    restart: unless-stopped
+    
+    # Environment configuration
+    environment:
+      # Flask configuration
+      - FLASK_ENV=production
+      - FLASK_PORT=5001
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY:-change-this-in-production}
+      
+      # Container configuration
+      - CONTAINER_ENV=true
+      
+      # Directory paths (configurable)
+      - MAIL_RULEZ_APP_DIR=/app
+      - MAIL_RULEZ_LOG_DIR=${MAIL_RULEZ_LOG_DIR:-/app/logs}
+      - MAIL_RULEZ_DATA_DIR=${MAIL_RULEZ_DATA_DIR:-/app/data}
+      - MAIL_RULEZ_LISTS_DIR=${MAIL_RULEZ_LISTS_DIR:-/app/lists}
+      - MAIL_RULEZ_BACKUPS_DIR=${MAIL_RULEZ_BACKUPS_DIR:-/app/backups}
+      - MAIL_RULEZ_CONFIG_DIR=${MAIL_RULEZ_CONFIG_DIR:-/app/config}
+      
+      # Logging configuration
+      - MAIL_RULEZ_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - MAIL_RULEZ_JSON_LOGS=true
+      - MAIL_RULEZ_LOG_RETENTION_DAYS=${LOG_RETENTION_DAYS:-30}
+      - MAIL_RULEZ_ENABLE_LOG_ROTATION=${ENABLE_LOG_ROTATION:-true}
+      
+      # Security configuration
+      - MAIL_RULEZ_MASTER_KEY=${MASTER_KEY}
+      - MAIL_RULEZ_STRICT_VALIDATION=${STRICT_VALIDATION:-true}
+      
+      # Optional feature toggles
+      - MAIL_RULEZ_SKIP_NETWORK_CHECK=${SKIP_NETWORK_CHECK:-false}
+      
+      # Optional: Database URL for future expansion
+      # - DATABASE_URL=${DATABASE_URL}
+    
+    # Port mapping
+    ports:
+      - "${HOST_PORT:-5001}:5001"
+    
+    # Volume mounts for persistence (using configurable paths)
+    volumes:
+      # Application data
+      - mail_rulez_data:${MAIL_RULEZ_DATA_DIR:-/app/data}
+      - mail_rulez_lists:${MAIL_RULEZ_LISTS_DIR:-/app/lists}
+      - mail_rulez_backups:${MAIL_RULEZ_BACKUPS_DIR:-/app/backups}
+      
+      # Logs (can be mounted to host for external log management)
+      - mail_rulez_logs:${MAIL_RULEZ_LOG_DIR:-/app/logs}
+      
+      # Configuration override (optional)
+      - type: bind
+        source: ${CONFIG_DIR:-./config}
+        target: ${MAIL_RULEZ_CONFIG_DIR:-/app/config}
+        read_only: true
+        bind:
+          create_host_path: true
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.5'
+    
+    # Health check configuration
+    healthcheck:
+      test: ["/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service=mail-rulez"
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    
+    # User mapping (optional, for better security)
+    # user: "${UID:-1000}:${GID:-1000}"
+    
+    # Dependencies (for future services)
+    # depends_on:
+    #   - redis
+    #   - postgres
+
+  # Log management sidecar (optional)
+  log-manager:
+    image: alpine:latest
+    container_name: mail-rulez-logs
+    restart: unless-stopped
+    
+    volumes:
+      - mail_rulez_logs:/logs:ro
+    
+    command: >
+      sh -c "
+        apk add --no-cache logrotate &&
+        while true; do
+          echo 'Log manager: $(date)' &&
+          find /logs -name '*.log.*' -mtime +${LOG_RETENTION_DAYS:-30} -delete 2>/dev/null || true &&
+          sleep 86400
+        done
+      "
+    
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+          cpus: '0.1'
+    
+    profiles:
+      - logging
+
+  # Monitoring sidecar (optional)
+  monitor:
+    image: alpine:latest
+    container_name: mail-rulez-monitor
+    restart: unless-stopped
+    
+    volumes:
+      - mail_rulez_logs:/logs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    
+    command: >
+      sh -c "
+        apk add --no-cache curl &&
+        while true; do
+          if ! curl -f http://mail-rulez:5001/auth/session/status >/dev/null 2>&1; then
+            echo 'ALERT: Mail-Rulez health check failed at $(date)' | tee -a /logs/monitor.log
+          fi
+          sleep 60
+        done
+      "
+    
+    depends_on:
+      - mail-rulez
+    
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+          cpus: '0.1'
+    
+    profiles:
+      - monitoring
+
+# Named volumes for data persistence
+volumes:
+  mail_rulez_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR:-./data}
+  
+  mail_rulez_lists:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${LISTS_DIR:-./lists}
+  
+  mail_rulez_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${LOGS_DIR:-./logs}
+  
+  mail_rulez_backups:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${BACKUPS_DIR:-./backups}
+
+# Networks
+networks:
+  default:
+    name: mail-rulez-network
+    driver: bridge

@@ -1,0 +1,69 @@
+# Test-specific Dockerfile for Mail-Rulez
+# Optimized for running automated tests in CI/CD pipelines
+
+FROM python:3.10-slim AS test-base
+
+# Set environment variables for testing
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    FLASK_ENV=testing \
+    MAIL_RULEZ_LOG_LEVEL=DEBUG \
+    MAIL_RULEZ_JSON_LOGS=false
+
+# Install system dependencies needed for testing
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create test user for security
+RUN groupadd -r testuser && useradd -r -g testuser testuser
+
+WORKDIR /app
+
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Install additional testing dependencies
+RUN pip install \
+    pytest-cov==6.0.0 \
+    pytest-xdist==3.7.0 \
+    pytest-mock==3.14.0 \
+    pytest-html==4.1.1
+
+# Copy application code
+COPY . .
+
+# Create test directories with proper permissions
+RUN mkdir -p /app/test-logs /app/test-data /app/test-lists /app/test-results && \
+    chown -R testuser:testuser /app
+
+# Set test-specific environment variables
+ENV MAIL_RULEZ_LOG_DIR=/app/test-logs \
+    MAIL_RULEZ_BASE_DIR=/app \
+    MAIL_RULEZ_LISTS_DIR=/app/test-lists \
+    PYTEST_CURRENT_TEST=true
+
+USER testuser
+
+# Default command runs all tests with coverage
+CMD ["python", "-m", "pytest", \
+     "--verbose", \
+     "--tb=short", \
+     "--cov=.", \
+     "--cov-report=html:test-results/htmlcov", \
+     "--cov-report=xml:test-results/coverage.xml", \
+     "--cov-report=term-missing", \
+     "--html=test-results/report.html", \
+     "--self-contained-html", \
+     "tests/"]
+
+# Health check for test container
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=1 \
+    CMD python -c "import sys; sys.exit(0)"
+
+# Volume for test results output
+VOLUME ["/app/test-results"]

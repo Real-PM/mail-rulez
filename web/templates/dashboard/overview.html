@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="bi bi-speedometer2"></i> Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshStats()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-white-75 small">CPU Usage</div>
+                            <div class="text-lg fw-bold">{{ "%.1f"|format(stats.cpu_percent) }}%</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-cpu fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">View Details</a>
+                    <div class="small text-white"><i class="bi bi-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-white-75 small">Memory Usage</div>
+                            <div class="text-lg fw-bold">{{ "%.1f"|format(stats.memory_percent) }}%</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-memory fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">View Details</a>
+                    <div class="small text-white"><i class="bi bi-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-white-75 small">Emails Today</div>
+                            <div class="text-lg fw-bold">{{ processing_stats.total_processed_today or 0 }}</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-envelope-check fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">View Details</a>
+                    <div class="small text-white"><i class="bi bi-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-white-75 small">Active Accounts</div>
+                            <div class="text-lg fw-bold">{{ account_count }}</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-person-gear fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ url_for('accounts.list_accounts') }}">Manage Accounts</a>
+                    <div class="small text-white"><i class="bi bi-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Stats and Recent Activity -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-bar-chart"></i> Email Processing Statistics
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Today's Processing</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success"></i> Whitelisted: {{ processing_stats.whitelisted_today or 0 }}</li>
+                                <li><i class="bi bi-x-circle text-danger"></i> Blacklisted: {{ processing_stats.blacklisted_today or 0 }}</li>
+                                <li><i class="bi bi-clock text-warning"></i> Pending: {{ processing_stats.pending_count or 0 }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>System Status</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-clock-history"></i> Last Run: {{ processing_stats.last_run or 'Never' }}</li>
+                                <li><i class="bi bi-speedometer"></i> Avg Time: {{ processing_stats.avg_processing_time or '0.5s' }}</li>
+                                <li><i class="bi bi-exclamation-triangle"></i> Errors: {{ processing_stats.processing_errors or 0 }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-activity"></i> Recent Activity
+                </div>
+                <div class="card-body">
+                    {% if recent_activity %}
+                        {% for activity in recent_activity[:5] %}
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="me-2">
+                                {% if activity.status == 'success' %}
+                                    <i class="bi bi-check-circle text-success"></i>
+                                {% elif activity.status == 'error' %}
+                                    <i class="bi bi-x-circle text-danger"></i>
+                                {% else %}
+                                    <i class="bi bi-info-circle text-info"></i>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="small">{{ activity.message }}</div>
+                                <div class="text-muted small">{{ activity.timestamp.strftime('%H:%M:%S') }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent activity</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="row my-5">
+        <div class="col-12 text-center">
+            <img src="{{ url_for('static', filename='img/mailrulez-dark.png') }}" alt="{{ app_name }}" class="img-fluid" style="max-height: 200px;">
+        </div>
+    </div>
+
+    <!-- System Information -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-info-circle"></i> System Information
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Uptime:</strong> {{ stats.uptime }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Python:</strong> {{ stats.python_version }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Processes:</strong> {{ stats.processes }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Disk Usage:</strong> {{ "%.1f"|format(stats.disk_usage) }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function refreshStats() {
+    // TODO: Implement real-time stats refresh via AJAX
+    location.reload();
+}
+
+// Auto-refresh every 30 seconds
+setInterval(refreshStats, 30000);
+</script>
+{% endblock %}
