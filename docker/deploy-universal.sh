@@ -67,6 +67,12 @@ echo "✅ Docker and Docker Compose are available"
 echo "📁 Creating directories..."
 mkdir -p data lists logs backups config
 
+# Ensure config directory exists for bind mount
+if [ ! -d "config" ]; then
+    mkdir -p config
+    echo "📁 Created config directory for Docker bind mount"
+fi
+
 # Handle environment file setup
 ENV_FILE=".env"
 ENV_TEMPLATE="docker/.env.secure"
