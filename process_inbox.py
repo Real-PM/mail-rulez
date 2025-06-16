@@ -25,7 +25,7 @@ def process_inbox(account, folder="INBOX", limit=100):
     log["vendorlist count"] = len(vendorlist)
     #  Fetch mail
     mb = account.login()
-    mail_list = pf.fetch_class(mb)
+    mail_list = pf.fetch_class(mb, limit=limit)
 
     log["mail_list count"] = len(mail_list)
 
@@ -106,7 +106,7 @@ def process_inbox_maint(account, folder="INBOX", limit=500):
     log["vendorlist count"] = len(vendorlist)
     #  Fetch mail
     mb = account.login()
-    mail_list = pf.fetch_class(mb)
+    mail_list = pf.fetch_class(mb, limit=limit)
 
     log["mail_list count"] = len(mail_list)
 

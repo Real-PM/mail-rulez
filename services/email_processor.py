@@ -485,16 +485,17 @@ class EmailProcessor:
             )
     
     def _process_inbox_startup(self):
-        """Process inbox in startup mode"""
+        """Process inbox in startup mode with batch processing"""
         try:
             start_time = time.time()
-            self.logger.info(f"Starting inbox processing for {self.account_config.email}")
+            batch_size = 100  # Process 100 messages at a time in startup mode
+            self.logger.info(f"Starting inbox processing for {self.account_config.email} (batch size: {batch_size})")
             
             # TODO: Execute rules first (needs proper integration)
             # self._execute_rules()
             
-            # Process inbox with startup logic
-            result = pi.process_inbox(self.account)
+            # Process inbox with startup logic and batch limit
+            result = pi.process_inbox(self.account, limit=batch_size)
             self.logger.info(f"Process inbox result: {result}")
             
             # Update statistics
@@ -502,28 +503,29 @@ class EmailProcessor:
             self._update_stats(result, processing_time)
             
             self.consecutive_errors = 0
-            self.logger.info(f"Startup inbox processing completed in {processing_time:.2f}s")
+            self.logger.info(f"Startup inbox processing completed in {processing_time:.2f}s (processed {result.get('mail_list count', 0)} messages)")
             
         except Exception as e:
             self._handle_processing_error(e, "startup inbox processing")
     
     def _process_inbox_maintenance(self):
-        """Process inbox in maintenance mode"""
+        """Process inbox in maintenance mode with batch processing"""
         try:
             start_time = time.time()
+            batch_size = 200  # Process 200 messages at a time in maintenance mode
             
             # TODO: Execute rules first (needs proper integration)
             # self._execute_rules()
             
-            # Process inbox with maintenance logic
-            result = pi.process_inbox_maint(self.account)
+            # Process inbox with maintenance logic and batch limit
+            result = pi.process_inbox_maint(self.account, limit=batch_size)
             
             # Update statistics
             processing_time = time.time() - start_time
             self._update_stats(result, processing_time)
             
             self.consecutive_errors = 0
-            self.logger.debug(f"Maintenance inbox processing completed in {processing_time:.2f}s")
+            self.logger.debug(f"Maintenance inbox processing completed in {processing_time:.2f}s (processed {result.get('mail_list count', 0)} messages)")
             
         except Exception as e:
             self._handle_processing_error(e, "maintenance inbox processing")

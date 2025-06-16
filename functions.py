@@ -36,14 +36,15 @@ class Account():
         mb = MailBox(self.server).login(self.email, self.password)
         return mb
 
-def fetch_class(login, folder="INBOX", age=None):
+def fetch_class(login, folder="INBOX", age=None, limit=None):
     """
-    Fetches all messages from Account, classes them as Mail, changes date to date(), and returns list of those Mail
+    Fetches messages from Account, classes them as Mail, changes date to date(), and returns list of those Mail
+    :param limit: Maximum number of messages to fetch (None for all)
     :return: list of Mail
     """
     classed_mail = []
     login.folder.set(folder)
-    batch = login.fetch(mark_seen=False, bulk=True, reverse=True, headers_only=True)
+    batch = login.fetch(limit=limit, mark_seen=False, bulk=True, reverse=True, headers_only=True)
     for item in batch:
         item = Mail(item.uid, item.subject, item.from_, item.date_str, item.date)
         classed_mail.append(item)
@@ -51,20 +52,6 @@ def fetch_class(login, folder="INBOX", age=None):
         item.date = item.date.date()
     return classed_mail
 
-def fetch_class_100(login, folder="INBOX", age=None):
-    """
-    Fetches 100 messages from Account, classes them as Mail, changes date to date(), and returns list of those Mail
-    :return: list of Mail
-    """
-    classed_mail = []
-    login.folder.set(folder)
-    batch = login.fetch(limit=100, mark_seen=False, bulk=True, reverse=True, headers_only=True)
-    for item in batch:
-        item = Mail(item.uid, item.subject, item.from_, item.date_str, item.date)
-        classed_mail.append(item)
-    for item in classed_mail:
-        item.date = item.date.date()
-    return classed_mail
 
 def purge_old(login, folder, age):
     """Purges all messages in specified folder over a specified age"""
