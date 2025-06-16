@@ -59,7 +59,7 @@ WORKDIR /app
 
 # Copy requirements and install production dependencies
 COPY requirements.txt .
-RUN pip install --no-dev -r requirements.txt && \
+RUN pip install -r requirements.txt && \
     pip install gunicorn
 
 # Copy application code
