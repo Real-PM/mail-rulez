@@ -57,12 +57,8 @@ services:
       - mail_rulez_backups:/app/backups
       - mail_rulez_logs:/app/logs
       
-      # Optional config override (bind mount)
-      - type: bind
-        source: ${CONFIG_DIR:-./config}
-        target: /app/config
-        read_only: true
-        consistency: cached
+      # Optional config override (bind mount) 
+      - ${CONFIG_DIR:-./config}:/app/config:ro
     
     # Resource limits (Docker Swarm compatible)
     deploy:
