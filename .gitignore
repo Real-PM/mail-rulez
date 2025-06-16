@@ -3,3 +3,12 @@ CLAUDE.MD.backup
 FEATURE_PLANS.md
 DOCKER.MD
 reflection.md
+DEPLOYMENT-NOTES.md
+
+# Testing directories
+data/
+lists/
+logs/
+backups/
+config/
+.env

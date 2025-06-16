@@ -1,0 +1,120 @@
+# Docker Compose for Mail-Rulez Local Development
+# Simplified configuration with host networking
+
+services:
+  mail-rulez:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.minimal
+    container_name: mail-rulez-local
+    restart: unless-stopped
+    network_mode: host
+    
+    # Environment configuration
+    environment:
+      # Flask configuration
+      - FLASK_ENV=development
+      - FLASK_PORT=5001
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY:-change-this-in-production}
+      
+      # Container configuration
+      - CONTAINER_ENV=true
+      
+      # Directory paths (configurable)
+      - MAIL_RULEZ_APP_DIR=/app
+      - MAIL_RULEZ_LOG_DIR=${MAIL_RULEZ_LOG_DIR:-/app/logs}
+      - MAIL_RULEZ_DATA_DIR=${MAIL_RULEZ_DATA_DIR:-/app/data}
+      - MAIL_RULEZ_LISTS_DIR=${MAIL_RULEZ_LISTS_DIR:-/app/lists}
+      - MAIL_RULEZ_BACKUPS_DIR=${MAIL_RULEZ_BACKUPS_DIR:-/app/backups}
+      - MAIL_RULEZ_CONFIG_DIR=${MAIL_RULEZ_CONFIG_DIR:-/app/config}
+      
+      # Logging configuration
+      - MAIL_RULEZ_LOG_LEVEL=${LOG_LEVEL:-DEBUG}
+      - MAIL_RULEZ_JSON_LOGS=false
+      - MAIL_RULEZ_LOG_RETENTION_DAYS=${LOG_RETENTION_DAYS:-30}
+      - MAIL_RULEZ_ENABLE_LOG_ROTATION=${ENABLE_LOG_ROTATION:-true}
+      
+      # Security configuration
+      - MAIL_RULEZ_MASTER_KEY=${MASTER_KEY}
+      - MAIL_RULEZ_STRICT_VALIDATION=${STRICT_VALIDATION:-false}
+      
+      # Optional feature toggles
+      - MAIL_RULEZ_SKIP_NETWORK_CHECK=${SKIP_NETWORK_CHECK:-true}
+    
+    # Volume mounts for persistence (using configurable paths)
+    volumes:
+      # Application data
+      - mail_rulez_data:${MAIL_RULEZ_DATA_DIR:-/app/data}
+      - mail_rulez_lists:${MAIL_RULEZ_LISTS_DIR:-/app/lists}
+      - mail_rulez_backups:${MAIL_RULEZ_BACKUPS_DIR:-/app/backups}
+      
+      # Logs (can be mounted to host for external log management)
+      - mail_rulez_logs:${MAIL_RULEZ_LOG_DIR:-/app/logs}
+      
+      # Configuration override (optional)
+      - type: bind
+        source: ${CONFIG_DIR:-./config}
+        target: ${MAIL_RULEZ_CONFIG_DIR:-/app/config}
+        read_only: false
+        bind:
+          create_host_path: true
+    
+    # Resource limits (relaxed for development)
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '2.0'
+        reservations:
+          memory: 512M
+          cpus: '1.0'
+    
+    # Health check configuration  
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/auth/session/status')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service=mail-rulez-local"
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+
+# Named volumes for data persistence
+volumes:
+  mail_rulez_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR:-./data}
+  
+  mail_rulez_lists:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${LISTS_DIR:-./lists}
+  
+  mail_rulez_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${LOGS_DIR:-./logs}
+  
+  mail_rulez_backups:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${BACKUPS_DIR:-./backups}
