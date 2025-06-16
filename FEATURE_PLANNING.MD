@@ -244,3 +244,260 @@ class GmailLabelManager:
 ---
 
 *This feature addresses the fundamental architectural mismatch between folder-based email processing and Gmail's label-based system, ensuring clean and predictable email workflows for Gmail users.*
+
+---
+
+# Processed Folder Cleanup Feature
+
+## Problem Statement
+
+When the system transitions from **Startup Mode** to **Maintenance Mode**, the **Processed folder becomes redundant and unnecessary**. This creates several issues:
+
+### Current Behavior Analysis
+
+**Startup Mode:**
+- Whitelisted emails → **Processed folder** (auto-processed)
+- Blacklisted emails → Junk folder
+- Vendor emails → Approved Ads folder  
+- Unknown emails → Pending folder
+
+**Maintenance Mode:**
+- Whitelisted emails → **Stay in Inbox** (user handles manually)
+- Blacklisted emails → Junk folder
+- Vendor emails → Approved Ads folder
+- Unknown emails → Pending folder
+
+### Issues with Current Approach
+
+1. **Folder Confusion**: Users see a Processed folder that will never receive new messages
+2. **Storage Waste**: Processed folder may contain thousands of old emails taking up space
+3. **IMAP Clutter**: Unnecessary folder structure in user's email client
+4. **Gmail Labels**: For Gmail users, the "Processed" label continues to exist unused
+5. **User Uncertainty**: Users don't understand why the folder exists but is empty
+
+## Proposed Solution: Processed Folder Cleanup UX Flow
+
+### Feature: Startup-to-Maintenance Transition Assistant
+
+When transitioning from Startup to Maintenance mode, present user with **Processed Folder Cleanup Options**.
+
+#### UX Flow Design
+
+**Step 1: Transition Detection**
+- System detects when switching from Startup → Maintenance mode
+- Trigger cleanup dialog/wizard before completing transition
+
+**Step 2: Processed Folder Analysis**
+```
+Processed Folder Status:
+├── Message Count: 2,847 messages
+├── Date Range: Jan 15, 2024 - Jun 16, 2025
+├── Storage Size: ~145 MB
+└── Folder Type: IMAP folder / Gmail label
+```
+
+**Step 3: User Choice Dialog**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  🔄 Transitioning to Maintenance Mode                           │
+│                                                                 │
+│  Your Processed folder contains 2,847 messages and is no       │
+│  longer needed in Maintenance Mode. What would you like to do? │
+│                                                                 │
+│  ○ Delete Processed folder and all messages                    │
+│    ⚠️  This will permanently remove 2,847 messages             │
+│                                                                 │
+│  ○ Keep Processed folder (recommended)                         │
+│    ✓ Messages remain accessible                                │
+│    ✓ Folder becomes read-only                                  │
+│                                                                 │
+│  ○ Archive messages to [Custom Folder] and delete Processed   │
+│    📁 Move to: [Dropdown: Archive, Old Messages, etc.]        │
+│                                                                 │
+│  ○ Export messages and delete Processed folder                 │
+│    💾 Download as: [mbox/eml format]                          │
+│                                                                 │
+│  [ Cancel ]  [ Continue with Selected Option ]                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### Implementation Options
+
+**Option 1: Keep Processed Folder (Default/Recommended)**
+- Mark folder as "read-only" in system configuration
+- Add UI indicator that folder is archived/inactive
+- Display message: "Contains messages from Startup Mode (Jan-Jun 2025)"
+
+**Option 2: Delete Processed Folder**
+- Verify folder is not empty → Show warning
+- For Gmail: Remove "Processed" label from all messages
+- For IMAP: Delete folder after moving/deleting messages
+- Confirmation step with final warning
+
+**Option 3: Archive Messages**
+- Move all Processed messages to user-specified folder
+- Delete empty Processed folder
+- Update system configuration to reflect new archive location
+
+**Option 4: Export and Delete**
+- Generate downloadable archive (mbox/eml format)
+- Provide download link with expiration
+- Delete Processed folder after successful download
+
+#### Advanced UX Features
+
+**Smart Recommendations:**
+```python
+def recommend_cleanup_option(processed_count, account_type, storage_usage):
+    if processed_count > 5000:
+        return "archive"  # Too many to delete safely
+    elif account_type == "gmail" and storage_usage > 80:
+        return "delete"   # Gmail storage pressure
+    elif processed_count < 100:
+        return "keep"     # Small enough to keep
+    else:
+        return "archive"  # Default safe option
+```
+
+**Folder Analysis Preview:**
+- Show date range of messages
+- Display top senders in Processed folder
+- Storage impact calculation
+- Estimated time for cleanup operation
+
+#### Gmail-Specific Considerations
+
+**Gmail Label Cleanup:**
+- Remove "Processed" label from all messages
+- Messages return to Inbox or other labels they have
+- Use `gmail_aware_move()` function for clean removal
+- Handle conversation threading properly
+
+**Gmail Storage Impact:**
+- Show storage savings potential
+- Account for Gmail's storage counting methods
+- Consider shared storage across Google services
+
+#### Error Handling & Safety
+
+**Pre-Flight Checks:**
+- Verify IMAP connection stability
+- Check folder access permissions
+- Estimate operation time for large folders
+- Create backup plan for failed operations
+
+**Safety Measures:**
+- Confirmation emails sent to user
+- Operation logging for audit trail
+- Rollback capability for recent operations
+- Progress indicators for long operations
+
+**Error Recovery:**
+- Partial completion handling
+- Resume interrupted operations
+- User notification of any issues
+- Technical support contact information
+
+#### Configuration Storage
+
+**System Configuration Updates:**
+```json
+{
+  "account_config": {
+    "email": "user@example.com",
+    "processed_folder_status": {
+      "exists": false,
+      "cleanup_date": "2025-06-16T21:30:00Z",
+      "cleanup_method": "archived_to_old_messages",
+      "message_count_processed": 2847,
+      "user_choice": "archive"
+    }
+  }
+}
+```
+
+#### Database Schema (if applicable)
+
+```sql
+CREATE TABLE processed_folder_cleanup (
+    account_email VARCHAR(255) PRIMARY KEY,
+    cleanup_date TIMESTAMP,
+    cleanup_method ENUM('keep', 'delete', 'archive', 'export'),
+    messages_affected INTEGER,
+    target_folder VARCHAR(255),
+    completed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Implementation Plan
+
+### Phase 1: Detection and Analysis ⭐ HIGH PRIORITY
+- [ ] Detect startup-to-maintenance transitions
+- [ ] Analyze Processed folder contents (count, size, date range)
+- [ ] Create folder analysis functions
+- [ ] Design UX mockups and user flows
+
+### Phase 2: Core Cleanup Operations
+- [ ] Implement keep/mark-as-archived option
+- [ ] Implement delete folder operation
+- [ ] Implement archive-to-folder operation
+- [ ] Add Gmail-specific label cleanup
+- [ ] Create progress tracking and logging
+
+### Phase 3: Advanced Features
+- [ ] Export functionality (mbox/eml formats)
+- [ ] Smart recommendation engine
+- [ ] Rollback/undo capabilities
+- [ ] Email notifications and confirmations
+
+### Phase 4: Integration and Testing
+- [ ] Integrate with transition workflow
+- [ ] Add configuration persistence
+- [ ] Comprehensive testing with various folder sizes
+- [ ] User acceptance testing
+
+## Technical Requirements
+
+### Backend Functions Needed
+```python
+def analyze_processed_folder(account) -> ProcessedFolderAnalysis
+def cleanup_processed_folder(account, method, options) -> CleanupResult  
+def archive_processed_messages(account, target_folder) -> ArchiveResult
+def export_processed_messages(account, format='mbox') -> ExportResult
+def gmail_remove_processed_label(account) -> LabelCleanupResult
+```
+
+### Frontend Components Needed
+- Transition wizard modal/page
+- Folder analysis display component
+- Progress indicator for cleanup operations
+- Confirmation dialogs with safety warnings
+- Results/completion summary page
+
+### Configuration Integration
+- Extend account configuration schema
+- Add processed folder status tracking
+- Integration with existing folder configuration system
+- Support for per-account cleanup preferences
+
+## Success Criteria
+
+1. **User Control**: Users can choose what happens to Processed folder during transition
+2. **Safety**: No accidental data loss with proper warnings and confirmations
+3. **Clarity**: Clear explanation of each option and its consequences
+4. **Efficiency**: Cleanup operations complete reliably without user intervention
+5. **Gmail Compatibility**: Proper label cleanup for Gmail accounts
+6. **Audit Trail**: Complete logging of cleanup operations for support
+
+## Related Features
+
+- **Mode Transition System**: Integrates with existing startup/maintenance mode switching
+- **Gmail-Aware Processing**: Uses Gmail label cleanup functions
+- **Folder Configuration**: May affect per-account folder customization
+- **Storage Management**: Relates to retention policies and storage optimization
+
+---
+
+*This feature provides a clean, user-controlled transition experience while eliminating folder confusion and potential storage waste during the critical startup-to-maintenance mode change.*
