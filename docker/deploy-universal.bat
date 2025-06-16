@@ -1,10 +1,34 @@
 @echo off
 REM Mail-Rulez Universal Deployment Script for Windows
 REM Compatible with Windows Command Prompt and PowerShell
+REM Run from project root: docker\deploy-universal.bat
 
 echo 🚀 Mail-Rulez Universal Deployment
 echo ===================================
 echo 🖥️  Detected OS: Windows
+
+REM Change to project root directory if we're in the docker subdirectory
+for %%I in (.) do set "CURRENT_DIR=%%~nxI"
+if /i "%CURRENT_DIR%"=="docker" (
+    echo 📁 Changing to project root directory...
+    cd ..
+)
+
+REM Verify we're in the correct directory
+if not exist "requirements.txt" (
+    echo ❌ Error: This script must be run from the Mail-Rulez project root directory
+    echo    Usage: docker\deploy-universal.bat
+    pause
+    exit /b 1
+)
+if not exist "docker" (
+    echo ❌ Error: docker directory not found
+    echo    Usage: docker\deploy-universal.bat
+    pause
+    exit /b 1
+)
+
+echo ✅ Running from project root: %CD%
 
 REM Check if docker is available
 docker --version >nul 2>&1
@@ -46,7 +70,7 @@ if not exist "config" mkdir config
 
 REM Handle environment file setup
 set ENV_FILE=.env
-set ENV_TEMPLATE=.env.secure
+set ENV_TEMPLATE=docker\.env.secure
 
 if not exist "%ENV_FILE%" (
     if exist "%ENV_TEMPLATE%" (
@@ -71,10 +95,10 @@ if not exist "%ENV_FILE%" (
 )
 
 REM Use universal docker-compose file
-set COMPOSE_FILE=docker-compose.universal.yml
+set COMPOSE_FILE=docker\docker-compose.universal.yml
 if not exist "%COMPOSE_FILE%" (
-    echo ❌ %COMPOSE_FILE% not found. Using docker-compose.yml as fallback.
-    set COMPOSE_FILE=docker-compose.yml
+    echo ❌ %COMPOSE_FILE% not found. Using docker\docker-compose.yml as fallback.
+    set COMPOSE_FILE=docker\docker-compose.yml
 )
 
 REM Stop any existing containers

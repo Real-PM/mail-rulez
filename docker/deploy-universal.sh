@@ -1,11 +1,29 @@
 #!/bin/bash
 # Mail-Rulez Universal Deployment Script
 # Compatible with Linux, macOS, Windows (Git Bash/WSL), and other Unix-like systems
+# Run from project root: ./docker/deploy-universal.sh
 
 set -e
 
 echo "🚀 Mail-Rulez Universal Deployment"
 echo "==================================="
+
+# Change to project root directory if we're in the docker subdirectory
+if [ "$(basename "$(pwd)")" = "docker" ]; then
+    echo "📁 Changing to project root directory..."
+    cd ..
+fi
+
+# Verify we're in the correct directory
+if [ ! -f "requirements.txt" ] || [ ! -d "docker" ]; then
+    echo "❌ Error: This script must be run from the Mail-Rulez project root directory"
+    echo "   Current directory: $(pwd)"
+    echo "   Expected files: requirements.txt, docker/ directory"
+    echo "   Usage: ./docker/deploy-universal.sh"
+    exit 1
+fi
+
+echo "✅ Running from project root: $(pwd)"
 
 # Detect operating system
 OS="unknown"
@@ -51,7 +69,7 @@ mkdir -p data lists logs backups config
 
 # Handle environment file setup
 ENV_FILE=".env"
-ENV_TEMPLATE=".env.secure"
+ENV_TEMPLATE="docker/.env.secure"
 
 if [ ! -f "$ENV_FILE" ]; then
     if [ -f "$ENV_TEMPLATE" ]; then
@@ -81,10 +99,14 @@ else
 fi
 
 # Use universal docker-compose file
-COMPOSE_FILE="docker-compose.universal.yml"
+COMPOSE_FILE="docker/docker-compose.universal.yml"
 if [ ! -f "$COMPOSE_FILE" ]; then
-    echo "❌ $COMPOSE_FILE not found. Using docker-compose.yml as fallback."
-    COMPOSE_FILE="docker-compose.yml"
+    echo "❌ $COMPOSE_FILE not found. Using docker/docker-compose.yml as fallback."
+    COMPOSE_FILE="docker/docker-compose.yml"
+    if [ ! -f "$COMPOSE_FILE" ]; then
+        echo "❌ No docker-compose file found. Please check your installation."
+        exit 1
+    fi
 fi
 
 # Stop any existing containers
