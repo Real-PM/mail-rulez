@@ -56,9 +56,23 @@ def process_inbox(account, folder="INBOX", limit=100):
         approved_ads_folder = "INBOX.Approved_Ads"
         pending_folder = "INBOX.Pending"
     
-    mb.move(whitelisted, processed_folder)
-    mb.move(blacklisted, junk_folder)
-    mb.move(vendorlist, approved_ads_folder)
+    # Use Gmail-aware processing if Gmail account
+    if pf.is_gmail_account(account.email):
+        # Gmail-specific processing with label cleanup
+        if whitelisted:
+            gmail_result = pf.gmail_aware_move(mb, whitelisted, processed_folder, 'INBOX')
+            log["gmail_whitelist_result"] = gmail_result
+        if blacklisted:
+            gmail_result = pf.gmail_aware_move(mb, blacklisted, junk_folder, 'INBOX')
+            log["gmail_blacklist_result"] = gmail_result
+        if vendorlist:
+            gmail_result = pf.gmail_aware_move(mb, vendorlist, approved_ads_folder, 'INBOX')
+            log["gmail_vendor_result"] = gmail_result
+    else:
+        # Standard IMAP processing
+        mb.move(whitelisted, processed_folder)
+        mb.move(blacklisted, junk_folder)
+        mb.move(vendorlist, approved_ads_folder)
     
     # Apply retention policy to approved_ads folder after moving vendor emails
     if vendorlist:  # Only if we moved any vendor emails
@@ -77,7 +91,12 @@ def process_inbox(account, folder="INBOX", limit=100):
                    item.from_ not in vendorlist]
         log["uids in pending"] = pending
 
-        mb.move(pending, pending_folder)
+        # Use Gmail-aware processing for pending messages
+        if pf.is_gmail_account(account.email) and pending:
+            gmail_result = pf.gmail_aware_move(mb, pending, pending_folder, 'INBOX')
+            log["gmail_pending_result"] = gmail_result
+        else:
+            mb.move(pending, pending_folder)
     else:
         pass
 
@@ -136,8 +155,19 @@ def process_inbox_maint(account, folder="INBOX", limit=500):
         pending_folder = "INBOX.Pending"
     
     # In maintenance mode, don't move whitelisted emails to processed
-    mb.move(blacklisted, junk_folder)
-    mb.move(vendorlist, approved_ads_folder)
+    # Use Gmail-aware processing if Gmail account
+    if pf.is_gmail_account(account.email):
+        # Gmail-specific processing with label cleanup
+        if blacklisted:
+            gmail_result = pf.gmail_aware_move(mb, blacklisted, junk_folder, 'INBOX')
+            log["gmail_blacklist_result"] = gmail_result
+        if vendorlist:
+            gmail_result = pf.gmail_aware_move(mb, vendorlist, approved_ads_folder, 'INBOX')
+            log["gmail_vendor_result"] = gmail_result
+    else:
+        # Standard IMAP processing
+        mb.move(blacklisted, junk_folder)
+        mb.move(vendorlist, approved_ads_folder)
     
     # Apply retention policy to approved_ads folder after moving vendor emails
     if vendorlist:  # Only if we moved any vendor emails

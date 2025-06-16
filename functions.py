@@ -5,6 +5,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 import os
+import logging
 from config import get_config
 load_dotenv()
 
@@ -167,7 +168,13 @@ def process_folder(list_file, account, start_folder, dest_folder):
 
     #  All messages must be moved
     msgs_to_move = [item.uid for item in mail_list]
-    mb.move(msgs_to_move, dest_folder)
+    
+    # Use Gmail-aware move if Gmail account
+    if is_gmail_account(account.email):
+        gmail_result = gmail_aware_move(mb, msgs_to_move, dest_folder, start_folder)
+        log["gmail_move_result"] = gmail_result
+    else:
+        mb.move(msgs_to_move, dest_folder)
     log["Messages Processed"] = len(msgs_to_move)
     log["Diff"] = len(mail_list) - len(msgs_to_move)
 
@@ -213,6 +220,106 @@ def _get_folder_type_from_name(folder_name):
                 return folder_type
     
     return None
+
+
+def is_gmail_account(account_email):
+    """
+    Detect if account is Gmail-based by checking domain
+    :param account_email: Email address string
+    :return: True if Gmail account, False otherwise
+    """
+    if not account_email:
+        return False
+    
+    gmail_domains = ['gmail.com', 'googlemail.com']
+    account_domain = account_email.lower().split('@')[-1] if '@' in account_email else ''
+    
+    return account_domain in gmail_domains
+
+
+def remove_gmail_label(mailbox, message_uids, label_name):
+    """
+    Remove specific label from Gmail messages
+    :param mailbox: IMAP mailbox connection
+    :param message_uids: List of message UIDs to process
+    :param label_name: Gmail label/folder name to remove
+    :return: Success count and error list
+    """
+    if not message_uids:
+        return 0, []
+    
+    success_count = 0
+    errors = []
+    
+    try:
+        # Convert label name to Gmail format if needed
+        gmail_label = label_name.replace('INBOX.', '') if label_name.startswith('INBOX.') else label_name
+        
+        # Process each message UID
+        for uid in message_uids:
+            try:
+                # Use IMAP STORE command to remove Gmail label
+                result = mailbox.client.uid('STORE', uid, '-X-GM-LABELS', f'"{gmail_label}"')
+                if result[0] == 'OK':
+                    success_count += 1
+                else:
+                    errors.append(f"UID {uid}: {result[1]}")
+            except Exception as e:
+                errors.append(f"UID {uid}: {str(e)}")
+                logging.warning(f"Failed to remove label {gmail_label} from message {uid}: {e}")
+    
+    except Exception as e:
+        logging.error(f"Error removing Gmail label {label_name}: {e}")
+        errors.append(f"General error: {str(e)}")
+    
+    if errors:
+        logging.warning(f"Gmail label removal had {len(errors)} errors out of {len(message_uids)} messages")
+    
+    return success_count, errors
+
+
+def gmail_aware_move(mailbox, message_uids, destination_folder, source_folder=None):
+    """
+    Gmail-specific move that properly handles label cleanup
+    
+    :param mailbox: IMAP connection
+    :param message_uids: List of message UIDs to move
+    :param destination_folder: Target label/folder
+    :param source_folder: Source label/folder to remove (optional)
+    :return: Dict with move results and label cleanup stats
+    """
+    result = {
+        'moved': 0,
+        'label_removed': 0,
+        'errors': []
+    }
+    
+    if not message_uids:
+        return result
+    
+    try:
+        # First, perform the standard move operation (adds destination label)
+        mailbox.move(message_uids, destination_folder)
+        result['moved'] = len(message_uids)
+        logging.info(f"Gmail: Moved {len(message_uids)} messages to {destination_folder}")
+        
+        # Then remove source label if specified (Gmail-specific cleanup)
+        if source_folder and source_folder not in ['INBOX', 'Inbox']:
+            success_count, errors = remove_gmail_label(mailbox, message_uids, source_folder)
+            result['label_removed'] = success_count
+            result['errors'].extend(errors)
+            
+            if success_count > 0:
+                logging.info(f"Gmail: Removed {success_count} source labels '{source_folder}'")
+            if errors:
+                logging.warning(f"Gmail: Label removal had {len(errors)} errors")
+    
+    except Exception as e:
+        error_msg = f"Gmail move operation failed: {str(e)}"
+        result['errors'].append(error_msg)
+        logging.error(error_msg)
+    
+    return result
 
 
 def forward(account, sndr_to_fwd, fwd_addr, sent_mail):

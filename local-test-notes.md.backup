@@ -1,0 +1,42 @@
+# Long Term Testing Notes for Local Container Deployment  
+  
+## Initial Setup
+-  Admin setup successful
+-  Initial login successful
+-  Logout/Login successful  
+  
+## Account Setup  
+[Defect: UI/UX]: The logo above the text "No Email Accounts Configured" is not there.  It looks like it's just Alt text. We should make sure that the logo images copied over to the container.
+
+### PurelyMail  
+-  Added, tested OK. 
+-  Folder creation successful  
+-  *Note: Starting services with 148 messages in inbox*
+-  Startup showed the "waiting" message and the success message.
+-  [Defect: Processing] Check the logs. In startup mode, there was a message that was placed in the _Approved folder and then processed back to the inbox before moving to Pending. I thought that this behavior was supposed to be maintenance, and that in startup, approved messages to go Processed.  
+
+  
+### GMAIL
+-  Account added, tested OK  
+-  Folder (label, in this case) creation successful  
+-  Startup successful  
+-  [Defect: Processing] Check logs for the gmail account. We have 12 conversations that went straight to Processed.  
+-  [Defect: Processing] Check the logs for the gmail account. We have items going to Approved Adds and the senders are not in vendors.  
+-  [Defect: Processing] Over 2300 messages in pending. Startup should be in batches of 
+-  
+## Dashboard  
+-  Recent Activity shows added account  
+[Defect: UI/UX]: "Emails Today" card shows a number that appears accurate, but the link to View Details is blank. I don't think we built this feature, so it would be best to remove the link. The same applies to CPU Usage and Memory Usage.  
+[Defect: UI/UX]: "Today's Processing" under "Email Processing Statistics" has 0 messages for Whitelisted, Blacklisted, Pending. This is not accurate. I like the idea of displaying these numbers, but there is a problem either with collecting or displaying them.
+
+## Rules
+-  [Defect: UI/UX]: There needs to be more vertical separation between the bootstrap cards for the Quick Start rules. The "Create Rule" button is directly on top of the rule beneath it. There should be at least 2 lines of space between those elements.  
+
+## Startup Mode
+-  [Defect: Processing] On startup, all 148 messages moved from inbox to Pending. The rule for startup mode should be batches of 100.  
+-  [Note: Documentation] While we don't need to change the functionality yet, we need the user to be aware that if there are 4 messages from *someone@example.com* and we only move one of those messages to a training folder, the remaining messages must be manually dispositioned from the Pending folder. No messages are getting processed from that folder.  
+-  [Future Enhancement] Process the pending folder to handle the above case.  
+
+## Lists
+-  Conflict detected successful  
+-  Conflict resolution successful  

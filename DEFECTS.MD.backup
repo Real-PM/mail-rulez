@@ -47,8 +47,7 @@ cp /mnt/hdd/PycharmProjects/mail_rules_rpm/web/static/img/mailrulez.png /mnt/hdd
 
 ### Resolution Date
 **Implementation Complete:** 2025-06-16  
-**Container Testing:** PENDING - Awaiting rebuild and test 
-of container image
+**Container Testing:** PENDING - Awaiting rebuild and test of container image
 
 ---
 
@@ -142,41 +141,10 @@ Unclear - requires log analysis to determine why Gmail conversations skipped nor
 **Estimated Effort:** 3-4 hours - Complex investigation requiring log analysis and provider-specific logic
 
 ### Solution
-**Root Cause Analysis:** Through log investigation and system analysis, discovered that Gmail conversations going to Processed is actually **expected behavior in startup mode**, not a defect.
-
-**Key Findings:**
-
-1. **Processing Logic is Working Correctly:**
-   - Log analysis shows proper batch processing (100 messages)
-   - Messages are correctly categorized based on sender lists
-   - Whitelist matches: `'uids in whitelist': ['3722', '3721', '3720', '3719']` → go to Processed
-   - Unknown senders: `'uids in pending': [3821...3769]` → go to Pending
-
-2. **Training System is Active:**
-   - Training folders automatically add senders to lists
-   - `'New Entries Detail': {'no-reply@tumblr.com'}` added to whitelist
-   - Once whitelisted, emails automatically go to Processed in startup mode
-
-3. **Startup vs Maintenance Mode Design:**
-   - **Startup mode**: Whitelisted emails → Processed (current behavior)
-   - **Maintenance mode**: Whitelisted emails stay in Inbox (different behavior)
-
-**Real Issue Identified:** This investigation revealed a more fundamental architectural issue - **Gmail's label system vs folder system**. The core problem is not the processing logic, but that Gmail uses labels which accumulate rather than folders which move messages cleanly.
-
-**Solution Implemented:** 
-- Created comprehensive feature planning document: `FEATURE_PLANNING.MD`
-- Identified need for Gmail-specific processing to handle label cleanup
-- Planned Gmail-aware move operations and label management system
-
-**Impact:** 
-- Defect #3 reclassified as "working as designed" 
-- Identified broader Gmail compatibility improvements needed
-- Planned future feature to properly handle Gmail label management
+[To be filled]
 
 ### Resolution Date
-**Analysis Complete:** 2025-06-16  
-**Status:** 🟡 RECLASSIFIED - Working as designed, but identified broader Gmail compatibility needs  
-**Follow-up:** Feature planned in FEATURE_PLANNING.MD for Gmail-specific processing
+[To be filled]
 
 ---
 
@@ -311,61 +279,10 @@ def process_inbox_startup(account, folder="INBOX", batch_size=100):
 **Estimated Effort:** 4-5 hours - High priority performance fix requiring careful implementation and testing
 
 ### Solution
-**Root Cause Identified:** The batch processing system had multiple issues:
-1. `fetch_class()` function didn't accept or use a `limit` parameter
-2. `process_inbox()` functions accepted `limit` but ignored it when calling `fetch_class()`
-3. `EmailProcessor` wasn't passing batch sizes to the processing functions
-
-**Fix Applied:** Implemented complete batch processing solution:
-
-**Changes Made:**
-
-1. **Enhanced `fetch_class()` function** (`functions.py:39-53`):
-   - Added `limit=None` parameter to function signature
-   - Updated IMAP fetch call to use `limit=limit` parameter
-   - Function now properly respects batch size limits
-
-2. **Updated `process_inbox()` functions** (`process_inbox.py:28,109`):
-   - Modified `process_inbox()` to pass `limit=limit` to `fetch_class()`
-   - Modified `process_inbox_maint()` to pass `limit=limit` to `fetch_class()`
-   - Both functions now properly implement batch processing
-
-3. **Enhanced EmailProcessor batch handling** (`services/email_processor.py:491,515`):
-   - Startup mode: Processes 100 messages per batch (line 491)
-   - Maintenance mode: Processes 200 messages per batch (line 515)
-   - Added logging to show batch sizes and processed message counts
-   - Improved performance monitoring for batch operations
-
-4. **Code Cleanup**:
-   - Removed redundant `fetch_class_100()` function
-   - Consolidated batch processing logic into single `fetch_class()` function
-
-**Implementation Details:**
-```python
-# Before: fetch_class fetched ALL messages
-mail_list = pf.fetch_class(mb)  # Could process 2300+ messages at once
-
-# After: fetch_class respects batch limits
-mail_list = pf.fetch_class(mb, limit=100)  # Processes exactly 100 messages
-```
-
-**Performance Impact:**
-- Startup mode: Now processes 100 messages per run instead of all messages
-- Maintenance mode: Now processes 200 messages per run instead of all messages
-- Prevents memory overload and system performance issues
-- Provides controlled, predictable email processing loads
-
-**Files Modified:**
-- `/functions.py` - Enhanced `fetch_class()` with limit parameter
-- `/process_inbox.py` - Updated both processing functions to use limits
-- `/services/email_processor.py` - Implemented proper batch size handling
-
-**Result:** Email processing now properly uses batch limits, preventing system overload when processing large mailboxes with thousands of messages.
+[To be filled]
 
 ### Resolution Date
-**Implementation Complete:** 2025-06-16  
-**Container Testing:** ✅ PASSED - Verified in mail-rulez:latest-test container  
-**Status:** 🟢 FULLY RESOLVED
+[To be filled]
 
 ---
 
@@ -462,8 +379,7 @@ If detail views are desired, create:
 
 ### Resolution Date
 **Implementation Complete:** 2025-06-16  
-**Container Testing:** ✅ PASSED - Verified in mail-rulez:latest-test container  
-**Status:** 🟢 FULLY RESOLVED
+**Container Testing:** PENDING - Awaiting rebuild and test of container image
 
 ---
 
@@ -676,5 +592,4 @@ Create specific CSS for the rules interface:
 
 ### Resolution Date
 **Implementation Complete:** 2025-06-16  
-**Container Testing:** ✅ PASSED - Verified in mail-rulez:latest-test container  
-**Status:** 🟢 FULLY RESOLVED
+**Container Testing:** PENDING - Awaiting rebuild and test of container image

@@ -73,7 +73,7 @@ class TestFetchClass:
         result = fetch_class(mock_login, folder="INBOX")
         
         mock_login.folder.set.assert_called_once_with("INBOX")
-        mock_login.fetch.assert_called_once_with(mark_seen=False, bulk=True, reverse=True, headers_only=True)
+        mock_login.fetch.assert_called_once_with(limit=None, mark_seen=False, bulk=True, reverse=True, headers_only=True)
         mock_mail_class.assert_called_once_with("123", "Test", "test@example.com", "Mon, 01 Jan 2024 12:00:00 +0000", datetime(2024, 1, 1, 12, 0, 0))
         assert len(result) == 1
         assert result[0].date == date(2024, 1, 1)
