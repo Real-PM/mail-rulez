@@ -105,6 +105,19 @@ class SecurityManager:
         decrypted_bytes = fernet.decrypt(encrypted_bytes)
         return decrypted_bytes.decode()
     
+    def encrypt_data(self, data: str) -> str:
+        """Encrypt arbitrary data for secure storage"""
+        fernet = self._get_fernet()
+        encrypted_bytes = fernet.encrypt(data.encode())
+        return base64.urlsafe_b64encode(encrypted_bytes).decode()
+    
+    def decrypt_data(self, encrypted_data: str) -> str:
+        """Decrypt arbitrary data from secure storage"""
+        fernet = self._get_fernet()
+        encrypted_bytes = base64.urlsafe_b64decode(encrypted_data.encode())
+        decrypted_bytes = fernet.decrypt(encrypted_bytes)
+        return decrypted_bytes.decode()
+    
     def hash_user_password(self, password: str) -> str:
         """Hash a user password for authentication storage"""
         salt = bcrypt.gensalt(rounds=self.config.password_salt_rounds)

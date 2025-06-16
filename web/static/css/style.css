@@ -141,3 +141,22 @@ footer {
 .badge {
     font-weight: 500;
 }
+
+/* Rules UI spacing improvements */
+.rule-card + .rule-card {
+    margin-top: 2rem;
+}
+
+.template-card + .template-card {
+    margin-top: 1.5rem;
+}
+
+/* Enhanced card spacing for better visual separation */
+.card.mb-4 {
+    margin-bottom: 2rem !important;
+}
+
+/* Rule-specific spacing improvements */
+.rules-grid .card {
+    margin-bottom: 2rem;
+}
