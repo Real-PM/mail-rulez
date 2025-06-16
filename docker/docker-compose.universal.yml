@@ -1,0 +1,113 @@
+# Docker Compose for Mail-Rulez - Universal Compatibility
+# Works on Linux, macOS, Windows, and any Docker-compatible system
+
+version: '3.8'
+
+services:
+  mail-rulez:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      target: production
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    container_name: mail-rulez-app
+    restart: unless-stopped
+    
+    # Environment configuration
+    environment:
+      # Flask configuration
+      - FLASK_ENV=production
+      - FLASK_PORT=5001
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY:-change-this-in-production}
+      
+      # Container configuration
+      - CONTAINER_ENV=true
+      
+      # Directory paths (configurable)
+      - MAIL_RULEZ_APP_DIR=/app
+      - MAIL_RULEZ_LOG_DIR=/app/logs
+      - MAIL_RULEZ_DATA_DIR=/app/data
+      - MAIL_RULEZ_LISTS_DIR=/app/lists
+      - MAIL_RULEZ_BACKUPS_DIR=/app/backups
+      - MAIL_RULEZ_CONFIG_DIR=/app/config
+      
+      # Logging configuration
+      - MAIL_RULEZ_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - MAIL_RULEZ_JSON_LOGS=true
+      - MAIL_RULEZ_LOG_RETENTION_DAYS=${LOG_RETENTION_DAYS:-30}
+      - MAIL_RULEZ_ENABLE_LOG_ROTATION=${ENABLE_LOG_ROTATION:-true}
+      
+      # Security configuration
+      - MAIL_RULEZ_MASTER_KEY=${MASTER_KEY}
+      - MAIL_RULEZ_STRICT_VALIDATION=${STRICT_VALIDATION:-true}
+      
+      # Optional feature toggles
+      - MAIL_RULEZ_SKIP_NETWORK_CHECK=${SKIP_NETWORK_CHECK:-false}
+    
+    # Port mapping (works on all platforms)
+    ports:
+      - "${PORT:-5001}:5001"
+    
+    # Universal volume mounts (works on Linux/macOS/Windows)
+    volumes:
+      # Named volumes for cross-platform compatibility
+      - mail_rulez_data:/app/data
+      - mail_rulez_lists:/app/lists
+      - mail_rulez_backups:/app/backups
+      - mail_rulez_logs:/app/logs
+      
+      # Optional config override (bind mount)
+      - type: bind
+        source: ${CONFIG_DIR:-./config}
+        target: /app/config
+        read_only: true
+        consistency: cached
+        bind:
+          create_host_path: true
+    
+    # Resource limits (Docker Swarm compatible)
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.5'
+    
+    # Health check configuration
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    
+    # Docker logging (universal)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Security options (Linux only, ignored on other platforms)
+    security_opt:
+      - no-new-privileges:true
+    
+    # Use default bridge network (most compatible)
+    # Custom networks can cause issues on some Docker setups
+
+# Universal named volumes (work on all platforms)
+volumes:
+  mail_rulez_data:
+    driver: local
+  
+  mail_rulez_lists:
+    driver: local
+  
+  mail_rulez_logs:
+    driver: local
+  
+  mail_rulez_backups:
+    driver: local
