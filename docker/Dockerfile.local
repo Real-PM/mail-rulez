@@ -1,0 +1,51 @@
+# Local development Dockerfile with minimal networking requirements
+FROM python:3.10-slim AS base
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Create app user for security
+RUN groupadd -r mailrulez && useradd -r -g mailrulez mailrulez
+
+# Local development stage - minimal dependencies
+FROM base AS local-dev
+
+WORKDIR /app
+
+# Copy requirements first for better layer caching
+COPY requirements.txt .
+
+# Install Python dependencies only (skip system packages that cause networking issues)
+RUN pip install -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Set configurable paths for development
+ENV MAIL_RULEZ_APP_DIR=/app \
+    MAIL_RULEZ_LOG_DIR=/app/logs \
+    MAIL_RULEZ_DATA_DIR=/app/data \
+    MAIL_RULEZ_LISTS_DIR=/app/lists \
+    MAIL_RULEZ_CONFIG_DIR=/app/config
+
+# Create directories with proper permissions
+RUN mkdir -p ${MAIL_RULEZ_LOG_DIR} ${MAIL_RULEZ_LISTS_DIR} ${MAIL_RULEZ_DATA_DIR} ${MAIL_RULEZ_CONFIG_DIR} && \
+    chown -R mailrulez:mailrulez /app
+
+# Set environment for development
+ENV FLASK_ENV=development \
+    MAIL_RULEZ_LOG_LEVEL=DEBUG \
+    MAIL_RULEZ_JSON_LOGS=false
+
+USER mailrulez
+
+EXPOSE 5001
+
+# Simple health check without curl dependency
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5001/auth/session/status')" || exit 1
+
+CMD ["python", "web/app.py"]

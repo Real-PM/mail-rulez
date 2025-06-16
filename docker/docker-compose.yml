@@ -1,7 +1,6 @@
 # Docker Compose for Mail-Rulez
 # Production-ready configuration with logging, monitoring, and persistence
 
-version: '3.8'
 
 services:
   mail-rulez:
@@ -48,9 +47,8 @@ services:
       # Optional: Database URL for future expansion
       # - DATABASE_URL=${DATABASE_URL}
     
-    # Port mapping
-    ports:
-      - "${HOST_PORT:-5001}:5001"
+    # Network mode
+    network_mode: host
     
     # Volume mounts for persistence (using configurable paths)
     volumes:
@@ -82,7 +80,7 @@ services:
     
     # Health check configuration
     healthcheck:
-      test: ["/healthcheck.sh"]
+      test: ["CMD", "/healthcheck.sh"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -113,6 +111,7 @@ services:
     image: alpine:latest
     container_name: mail-rulez-logs
     restart: unless-stopped
+    network_mode: host
     
     volumes:
       - mail_rulez_logs:/logs:ro
@@ -141,6 +140,7 @@ services:
     image: alpine:latest
     container_name: mail-rulez-monitor
     restart: unless-stopped
+    network_mode: host
     
     volumes:
       - mail_rulez_logs:/logs:ro
@@ -199,8 +199,3 @@ volumes:
       o: bind
       device: ${BACKUPS_DIR:-./backups}
 
-# Networks
-networks:
-  default:
-    name: mail-rulez-network
-    driver: bridge
