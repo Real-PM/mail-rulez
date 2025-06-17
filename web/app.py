@@ -119,5 +119,8 @@ def run_app():
     app.run(debug=True, host='0.0.0.0', port=port)
 
 
+# Create application instance for WSGI servers like Gunicorn
+application = create_app()
+
 if __name__ == '__main__':
     run_app()
