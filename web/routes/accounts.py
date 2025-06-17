@@ -102,7 +102,11 @@ class AccountForm(FlaskForm):
 @login_required
 def list_accounts():
     """List all configured email accounts"""
-    accounts = current_app.mail_config.accounts
+    # Force reload config to get latest saved accounts
+    from config import Config
+    fresh_config = Config(current_app.mail_config.base_dir, current_app.mail_config.config_file, current_app.mail_config.use_encryption)
+    accounts = fresh_config.accounts
+    current_app.logger.info(f"Accounts list page loaded {len(accounts)} accounts from config")
     return render_template('accounts/list.html', accounts=accounts)
 
 
@@ -160,14 +164,19 @@ def add_account():
 @login_required
 def edit_account(account_name):
     """Edit existing email account"""
+    # Force reload config to get latest saved accounts
+    from config import Config
+    fresh_config = Config(current_app.mail_config.base_dir, current_app.mail_config.config_file, current_app.mail_config.use_encryption)
+    
     # Find the account
     account = None
-    for acc in current_app.mail_config.accounts:
+    for acc in fresh_config.accounts:
         if acc.name == account_name:
             account = acc
             break
     
     if not account:
+        current_app.logger.error(f'Account "{account_name}" not found in {len(fresh_config.accounts)} loaded accounts')
         flash(f'Account "{account_name}" not found', 'error')
         return redirect(url_for('accounts.list_accounts'))
     
@@ -221,12 +230,15 @@ def edit_account(account_name):
             account.username = form.username.data
             account.use_ssl = form.use_ssl.data
             
-            # Save updated account
-            if save_all_accounts():
-                flash(f'Account "{account.name}" updated successfully!', 'success')
-                return redirect(url_for('accounts.list_accounts'))
-            else:
-                flash('Failed to save account configuration', 'error')
+            # Save updated account using fresh config
+            fresh_config.save_config()
+            current_app.logger.info(f"Updated and saved account: {account.name}")
+            
+            # Refresh task manager accounts
+            refresh_task_manager_accounts()
+            
+            flash(f'Account "{account.name}" updated successfully!', 'success')
+            return redirect(url_for('accounts.list_accounts'))
                 
         except Exception as e:
             current_app.logger.error(f"Error updating account: {e}")
@@ -240,21 +252,27 @@ def edit_account(account_name):
 def delete_account(account_name):
     """Delete email account"""
     try:
+        # Force reload config to get latest saved accounts
+        from config import Config
+        fresh_config = Config(current_app.mail_config.base_dir, current_app.mail_config.config_file, current_app.mail_config.use_encryption)
+        
         # Find and remove the account
-        accounts = current_app.mail_config.accounts
-        for i, account in enumerate(accounts):
+        for i, account in enumerate(fresh_config.accounts):
             if account.name == account_name:
-                del accounts[i]
+                del fresh_config.accounts[i]
                 break
         else:
             flash(f'Account "{account_name}" not found', 'error')
             return redirect(url_for('accounts.list_accounts'))
         
         # Save updated accounts list
-        if save_all_accounts():
-            flash(f'Account "{account_name}" deleted successfully!', 'success')
-        else:
-            flash('Failed to delete account', 'error')
+        fresh_config.save_config()
+        current_app.logger.info(f"Deleted account: {account_name}")
+        
+        # Refresh task manager accounts
+        refresh_task_manager_accounts()
+        
+        flash(f'Account "{account_name}" deleted successfully!', 'success')
             
     except Exception as e:
         current_app.logger.error(f"Error deleting account: {e}")
@@ -268,9 +286,13 @@ def delete_account(account_name):
 def test_connection(account_name):
     """Test IMAP connection for an account"""
     try:
+        # Force reload config to get latest saved accounts
+        from config import Config
+        fresh_config = Config(current_app.mail_config.base_dir, current_app.mail_config.config_file, current_app.mail_config.use_encryption)
+        
         # Find the account
         account = None
-        for acc in current_app.mail_config.accounts:
+        for acc in fresh_config.accounts:
             if acc.name == account_name:
                 account = acc
                 break
@@ -713,9 +735,13 @@ def create_folders(account_name):
 def get_account_folders(account_email):
     """API endpoint to get folders for a specific account (for rules dropdown)"""
     try:
+        # Force reload config to get latest saved accounts
+        from config import Config
+        fresh_config = Config(current_app.mail_config.base_dir, current_app.mail_config.config_file, current_app.mail_config.use_encryption)
+        
         # Find the account
         account = None
-        for acc in current_app.mail_config.accounts:
+        for acc in fresh_config.accounts:
             if acc.email == account_email:
                 account = acc
                 break
