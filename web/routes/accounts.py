@@ -636,10 +636,14 @@ def refresh_task_manager_accounts():
 def save_account(account):
     """Save a new account to configuration"""
     try:
-        # Add account to config and save
-        current_app.mail_config.accounts.append(account)
-        current_app.mail_config.save_config()
-        current_app.logger.info(f"Added and saved account: {account.name}")
+        # Force reload config to get latest saved accounts before adding new one
+        from config import Config
+        fresh_config = Config(current_app.mail_config.base_dir, current_app.mail_config.config_file, current_app.mail_config.use_encryption)
+        
+        # Add account to fresh config and save
+        fresh_config.accounts.append(account)
+        fresh_config.save_config()
+        current_app.logger.info(f"Added and saved account: {account.name} (total accounts now: {len(fresh_config.accounts)})")
         
         # Refresh task manager accounts
         refresh_task_manager_accounts()
