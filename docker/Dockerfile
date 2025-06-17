@@ -109,4 +109,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 VOLUME ["${MAIL_RULEZ_LOG_DIR}", "${MAIL_RULEZ_DATA_DIR}", "${MAIL_RULEZ_LISTS_DIR}", "${MAIL_RULEZ_BACKUPS_DIR}"]
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:5001 --workers 2 --worker-class gthread --threads 4 --access-logfile ${MAIL_RULEZ_LOG_DIR}/access.log --error-logfile ${MAIL_RULEZ_LOG_DIR}/error.log web.app:create_app"]
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:5001 --workers 2 --worker-class gthread --threads 4 --access-logfile ${MAIL_RULEZ_LOG_DIR}/access.log --error-logfile ${MAIL_RULEZ_LOG_DIR}/error.log web.app:application"]
