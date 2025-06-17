@@ -393,8 +393,16 @@ class TaskManager:
                     })
     
     def load_accounts_from_config(self):
-        """Load all accounts from configuration"""
+        """Load all accounts from configuration (always reload from file)"""
         try:
+            # Force reload of config from file to get latest saved accounts
+            from config import Config
+            self.logger.info(f"Reloading config from file: {self.config.base_dir}/{self.config.config_file}")
+            fresh_config = Config(self.config.base_dir, self.config.config_file, self.config.use_encryption)
+            self.config = fresh_config
+            
+            self.logger.info(f"Config reloaded, found {len(self.config.accounts)} accounts in file")
+            
             for account_config in self.config.accounts:
                 self.add_account(account_config)
             
@@ -408,10 +416,12 @@ class TaskManager:
         try:
             # Force reload of config by creating a new instance
             from config import Config
+            self.logger.info(f"Refreshing config from file: {self.config.base_dir}/{self.config.config_file}")
             fresh_config = Config(self.config.base_dir, self.config.config_file, self.config.use_encryption)
             
             # Update our config reference
             self.config = fresh_config
+            self.logger.info(f"Config refreshed, found {len(self.config.accounts)} accounts in file")
             
             # Get current account emails
             current_emails = set(self.processors.keys())
