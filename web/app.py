@@ -15,7 +15,7 @@ from flask_wtf.csrf import CSRFProtect
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config import get_config
-from security import get_security_manager, SessionManager
+from security import get_security_manager
 from logging_config import setup_for_environment, get_logger
 
 
@@ -39,12 +39,10 @@ def create_app(config_dir=None, testing=False):
     # Initialize Mail-Rulez components
     mail_config = get_config(base_dir=config_dir)
     security_manager = get_security_manager()
-    session_manager = SessionManager(security_manager)
     
     # Store managers in app context for access in routes
     app.mail_config = mail_config
     app.security_manager = security_manager
-    app.session_manager = session_manager
     
     # Register error handlers
     @app.errorhandler(404)
@@ -72,12 +70,8 @@ def create_app(config_dir=None, testing=False):
     
     # Helper function to get current user from session
     def get_current_user():
-        session_token = session.get('session_token')
-        if session_token:
-            user_session = app.session_manager.get_session(session_token)
-            if user_session:
-                return user_session.get('username')
-        return None
+        # Use Flask's built-in session directly - works across multiple worker processes
+        return session.get('username')
     
     # Make get_current_user available to routes
     app.get_current_user = get_current_user

@@ -93,14 +93,8 @@ def login():
             # Clear failed login attempts
             current_app.security_manager.clear_failed_attempts(username)
             
-            # Create session
-            session_token = current_app.session_manager.create_session(
-                username,
-                {'login_time': str(current_app.security_manager._failed_attempts)}
-            )
-            
-            # Store session token in Flask session
-            session['session_token'] = session_token
+            # Store username directly in Flask session (no custom SessionManager needed)
+            session['username'] = username
             session.permanent = True  # Always use permanent sessions for proper timeout
             
             flash(f'Welcome back, {username}!', 'success')
@@ -121,10 +115,6 @@ def login():
 @auth_bp.route('/logout')
 def logout():
     """Handle user logout"""
-    session_token = session.get('session_token')
-    if session_token:
-        current_app.session_manager.destroy_session(session_token)
-    
     session.clear()
     flash('You have been logged out successfully', 'info')
     return redirect(url_for('auth.login'))
@@ -212,15 +202,13 @@ def verify_user_credentials(username, password):
 @auth_bp.route('/session/status')
 def session_status():
     """API endpoint to check session status"""
-    session_token = session.get('session_token')
-    if session_token:
-        user_session = current_app.session_manager.get_session(session_token)
-        if user_session:
-            return {
-                'authenticated': True,
-                'username': user_session['username'],
-                'expires_in': 'TODO'  # Calculate remaining time
-            }
+    username = session.get('username')
+    if username:
+        return {
+            'authenticated': True,
+            'username': username,
+            'expires_in': 'TODO'  # Calculate remaining time
+        }
     
     return {'authenticated': False}
 
