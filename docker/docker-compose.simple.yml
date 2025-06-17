@@ -1,0 +1,87 @@
+# Simplified Docker Compose for Mail-Rulez - No .env file required
+# Self-contained deployment with runtime key generation
+
+version: '3.8'
+
+services:
+  mail-rulez:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: mail-rulez-simple
+    restart: unless-stopped
+    
+    # Port mapping
+    ports:
+      - "5001:5001"
+    
+    # Environment variables with secure defaults
+    environment:
+      # Flask configuration
+      - FLASK_ENV=production
+      - FLASK_PORT=5001
+      - FLASK_HOST=0.0.0.0
+      
+      # Container configuration
+      - CONTAINER_ENV=true
+      
+      # Directory paths
+      - MAIL_RULEZ_APP_DIR=/app
+      - MAIL_RULEZ_LOG_DIR=/app/logs
+      - MAIL_RULEZ_DATA_DIR=/app/data
+      - MAIL_RULEZ_LISTS_DIR=/app/lists
+      - MAIL_RULEZ_BACKUPS_DIR=/app/backups
+      - MAIL_RULEZ_CONFIG_DIR=/app/config
+      
+      # Logging configuration
+      - MAIL_RULEZ_LOG_LEVEL=INFO
+      - MAIL_RULEZ_JSON_LOGS=true
+      - MAIL_RULEZ_LOG_RETENTION_DAYS=30
+      - MAIL_RULEZ_ENABLE_LOG_ROTATION=true
+      
+      # Security configuration - keys will be generated at runtime
+      - MAIL_RULEZ_STRICT_VALIDATION=false  # Graceful startup
+      
+      # Feature toggles
+      - MAIL_RULEZ_SKIP_NETWORK_CHECK=false
+    
+    # Named volumes only - no bind mount issues
+    volumes:
+      - mail_rulez_data:/app/data
+      - mail_rulez_lists:/app/lists
+      - mail_rulez_backups:/app/backups
+      - mail_rulez_logs:/app/logs
+      - mail_rulez_config:/app/config
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # Docker logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Named volumes for cross-platform compatibility
+volumes:
+  mail_rulez_data:
+    driver: local
+  
+  mail_rulez_lists:
+    driver: local
+  
+  mail_rulez_logs:
+    driver: local
+  
+  mail_rulez_backups:
+    driver: local
+  
+  mail_rulez_config:
+    driver: local

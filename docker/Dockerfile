@@ -94,7 +94,8 @@ COPY docker/logrotate.conf /etc/logrotate.d/mailrulez
 # Copy startup scripts
 COPY docker/entrypoint.sh /entrypoint.sh
 COPY docker/healthcheck.sh /healthcheck.sh
-RUN chmod +x /entrypoint.sh /healthcheck.sh
+COPY docker/scripts/ /app/docker/scripts/
+RUN chmod +x /entrypoint.sh /healthcheck.sh /app/docker/scripts/*.py
 
 USER mailrulez
 

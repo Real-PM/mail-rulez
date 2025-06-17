@@ -58,6 +58,22 @@ log_info "Container ID: $(hostname)"
 log_info "Start time: $(date)"
 log_info "Environment: ${FLASK_ENV:-production}"
 
+# Step 1: Generate secure environment if needed
+log_info "Ensuring secure environment setup..."
+if [ -f "/app/docker/scripts/generate_environment.py" ]; then
+    python3 /app/docker/scripts/generate_environment.py || {
+        log_error "Environment generation failed"
+        if [ "${MAIL_RULEZ_STRICT_VALIDATION:-false}" = "true" ]; then
+            log_error "Exiting due to environment generation failure"
+            exit 1
+        else
+            log_warn "Continuing despite environment generation failure"
+        fi
+    }
+else
+    log_warn "Environment generation script not found - using existing environment"
+fi
+
 # Environment validation
 log_info "Validating environment..."
 
@@ -179,8 +195,10 @@ CONFIG_DIR="${MAIL_RULEZ_CONFIG_DIR:-/app}"
 MASTER_KEY_FILE="$CONFIG_DIR/.master_key"
 SECURE_CONFIG_FILE="$CONFIG_DIR/secure_config.json"
 
-if [ ! -f "$MASTER_KEY_FILE" ] && [ -z "$MAIL_RULEZ_MASTER_KEY" ]; then
-    log_warn "No master key found - will be generated on first run"
+if [ ! -f "$MASTER_KEY_FILE" ] && [ -z "$MAIL_RULEZ_MASTER_KEY" ] && [ -z "$MASTER_KEY" ]; then
+    log_warn "No master key found - should have been generated during environment setup"
+elif [ -n "$MASTER_KEY" ]; then
+    log_info "Master key configured via environment variable"
 fi
 
 if [ ! -f "$SECURE_CONFIG_FILE" ]; then
