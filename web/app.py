@@ -30,7 +30,7 @@ def create_app(config_dir=None, testing=False):
     # Configure Flask
     app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev-key-change-in-production')
     app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # 1 hour
-    app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour session timeout
+    app.config['PERMANENT_SESSION_LIFETIME'] = 24 * 3600  # 24 hour session timeout to match SecurityManager
     app.config['TESTING'] = testing
     
     # Initialize CSRF protection

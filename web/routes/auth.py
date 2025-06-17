@@ -101,7 +101,7 @@ def login():
             
             # Store session token in Flask session
             session['session_token'] = session_token
-            session.permanent = form.remember_me.data
+            session.permanent = True  # Always use permanent sessions for proper timeout
             
             flash(f'Welcome back, {username}!', 'success')
             

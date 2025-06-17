@@ -292,6 +292,14 @@ def test_connection(account_name):
 def api_test_connection():
     """Test IMAP connection with provided credentials"""
     try:
+        # Validate CSRF token manually for better error handling
+        from flask_wtf.csrf import validate_csrf
+        try:
+            validate_csrf(request.headers.get('X-CSRFToken'))
+        except Exception as e:
+            current_app.logger.warning(f"CSRF validation failed: {e}")
+            return jsonify({'success': False, 'error': 'CSRF token validation failed. Please refresh the page.'}), 400
+        
         data = request.get_json()
         
         # Create temporary account object for testing
