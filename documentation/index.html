@@ -3001,17 +3001,1656 @@ https://mail.yourcompany.com
 
                 <div id="list-management" class="content-section">
                     <h2><i class="fas fa-list text-primary"></i> List Management</h2>
-                    <p>List management content will be added here...</p>
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <p class="lead">List Management is the <strong>primary tool</strong> for cleaning up your inbox during startup mode. By categorizing email senders into whitelist, blacklist, vendor, and headhunter lists, you'll see dramatic improvements in inbox organization within days.</p>
+                            
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-lightbulb"></i> Why Lists First?</h6>
+                                <p class="mb-0">Lists provide <strong>immediate impact</strong> with minimal setup. Moving emails to training folders teaches Mail-Rulez your preferences, enabling automatic categorization that transforms your inbox from hundreds of mixed emails into organized, manageable folders.</p>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-graduation-cap text-success"></i> Understanding Training Folders</h3>
+                            </div>
+
+                            <p>Training folders are your primary interface for teaching Mail-Rulez about your email preferences. Each training folder corresponds to a specific list type:</p>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card border-success mb-3">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="fas fa-thumbs-up"></i> Whitelist Training</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <p><strong>Folder:</strong> <code>_whitelist</code></p>
+                                            <p><strong>Purpose:</strong> Trusted senders you always want to see</p>
+                                            <p><strong>Examples:</strong> Family, friends, colleagues, important services</p>
+                                            <p><strong>Result:</strong> Future emails go to INBOX.Processed folder</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-danger mb-3">
+                                        <div class="card-header bg-danger text-white">
+                                            <h6 class="mb-0"><i class="fas fa-thumbs-down"></i> Blacklist Training</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <p><strong>Folder:</strong> <code>_blacklist</code></p>
+                                            <p><strong>Purpose:</strong> Unwanted senders to block</p>
+                                            <p><strong>Examples:</strong> Spam, unwanted newsletters, scams</p>
+                                            <p><strong>Result:</strong> Future emails go directly to Junk folder</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card border-info mb-3">
+                                        <div class="card-header bg-info text-white">
+                                            <h6 class="mb-0"><i class="fas fa-store"></i> Vendor Training</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <p><strong>Folder:</strong> <code>_vendor</code></p>
+                                            <p><strong>Purpose:</strong> Marketing emails you occasionally want</p>
+                                            <p><strong>Examples:</strong> Store promotions, newsletters, deals</p>
+                                            <p><strong>Result:</strong> Future emails go to Approved Ads folder</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-secondary mb-3">
+                                        <div class="card-header bg-secondary text-white">
+                                            <h6 class="mb-0"><i class="fas fa-user-tie"></i> Headhunter Training</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <p><strong>Folder:</strong> <code>_headhunter</code></p>
+                                            <p><strong>Purpose:</strong> Job hunting and recruiting emails</p>
+                                            <p><strong>Examples:</strong> Recruiters, job alerts, career sites</p>
+                                            <p><strong>Result:</strong> Future emails go to HeadHunt folder</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="screenshot-placeholder">
+                                <i class="fas fa-camera fa-2x text-muted mb-2"></i>
+                                <p class="text-muted"><strong>Screenshot Placeholder:</strong> Training folders in email client showing _whitelist, _blacklist, _vendor, and _headhunter folders with example emails moved into each</p>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-hands-helping text-warning"></i> Hands-On Training Process</h3>
+                            </div>
+
+                            <p>Training Mail-Rulez is simple: <strong>drag and drop emails</strong> from your inbox into the appropriate training folders. Mail-Rulez monitors these folders and learns from your decisions.</p>
+
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-clock"></i> How Often Does Training Happen?</h6>
+                                <p>Mail-Rulez checks training folders <strong>every 4 minutes</strong> and immediately processes any emails you've moved there. You'll see results within minutes of your training actions.</p>
+                            </div>
+
+                            <div class="accordion" id="trainingProcessAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#training-step1">
+                                            <i class="fas fa-step-forward text-success me-3"></i>Step 1: Start with Your Inbox
+                                        </button>
+                                    </h2>
+                                    <div id="training-step1" class="accordion-collapse collapse show" data-bs-parent="#trainingProcessAccordion">
+                                        <div class="accordion-body">
+                                            <ol>
+                                                <li><strong>Open your email client</strong> (Outlook, Thunderbird, Apple Mail, etc.)</li>
+                                                <li><strong>Navigate to your Inbox</strong> - you should see mixed emails from various senders</li>
+                                                <li><strong>Look for the training folders</strong> that Mail-Rulez created:
+                                                    <ul>
+                                                        <li><code>_whitelist</code></li>
+                                                        <li><code>_blacklist</code></li>
+                                                        <li><code>_vendor</code></li>
+                                                        <li><code>_headhunter</code> (if applicable)</li>
+                                                    </ul>
+                                                </li>
+                                                <li><strong>Start with obvious choices</strong> - emails you clearly want to keep or block</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#training-step2">
+                                            <i class="fas fa-step-forward text-success me-3"></i>Step 2: Categorize Trusted Senders
+                                        </button>
+                                    </h2>
+                                    <div id="training-step2" class="accordion-collapse collapse" data-bs-parent="#trainingProcessAccordion">
+                                        <div class="accordion-body">
+                                            <h6><strong>Move emails to <code>_whitelist</code> folder:</strong></h6>
+                                            <ul>
+                                                <li><strong>Personal contacts:</strong> Family, friends, personal acquaintances</li>
+                                                <li><strong>Work communications:</strong> Colleagues, clients, business partners</li>
+                                                <li><strong>Important services:</strong> Bank notifications, medical providers, utilities</li>
+                                                <li><strong>Trusted subscriptions:</strong> News sources you read, professional newsletters</li>
+                                                <li><strong>Account notifications:</strong> Social media, software updates, security alerts</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-success">
+                                                <strong>Pro Tip:</strong> When in doubt, choose whitelist over blacklist. It's easier to move something to junk later than to miss an important email.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#training-step3">
+                                            <i class="fas fa-step-forward text-danger me-3"></i>Step 3: Block Unwanted Senders
+                                        </button>
+                                    </h2>
+                                    <div id="training-step3" class="accordion-collapse collapse" data-bs-parent="#trainingProcessAccordion">
+                                        <div class="accordion-body">
+                                            <h6><strong>Move emails to <code>_blacklist</code> folder:</strong></h6>
+                                            <ul>
+                                                <li><strong>Obvious spam:</strong> Phishing attempts, scams, random promotions</li>
+                                                <li><strong>Unwanted subscriptions:</strong> Lists you never signed up for</li>
+                                                <li><strong>Persistent marketers:</strong> Companies that ignore unsubscribe requests</li>
+                                                <li><strong>Outdated communications:</strong> Ex-employers, old services, closed accounts</li>
+                                                <li><strong>Annoying senders:</strong> Anyone whose emails you never want to see</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-warning">
+                                                <strong>Be Careful:</strong> Double-check before blacklisting. Consider whether the sender might ever send something important.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#training-step4">
+                                            <i class="fas fa-step-forward text-info me-3"></i>Step 4: Handle Marketing Emails
+                                        </button>
+                                    </h2>
+                                    <div id="training-step4" class="accordion-collapse collapse" data-bs-parent="#trainingProcessAccordion">
+                                        <div class="accordion-body">
+                                            <h6><strong>Move emails to <code>_vendor</code> folder:</strong></h6>
+                                            <ul>
+                                                <li><strong>Store promotions:</strong> Retailers you shop with occasionally</li>
+                                                <li><strong>Deal sites:</strong> Groupon, daily deal newsletters</li>
+                                                <li><strong>Service providers:</strong> Software companies, subscription services</li>
+                                                <li><strong>Professional newsletters:</strong> Industry updates, tech newsletters</li>
+                                                <li><strong>Event notifications:</strong> Webinars, conferences, meetups</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-info">
+                                                <strong>Strategy:</strong> Vendor emails go to a separate folder where you can review them when convenient, keeping your inbox clean for important communications.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-magic text-purple"></i> Automatic List Processing</h3>
+                            </div>
+
+                            <p>Once you move emails to training folders, Mail-Rulez automatically:</p>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                                        <h5>Extracts Sender</h5>
+                                        <p>Identifies the email address and domain of the sender</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
+                                        <h5>Updates Lists</h5>
+                                        <p>Adds sender to the appropriate list file (white.txt, black.txt, vendor.txt)</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <i class="fas fa-folder-open fa-3x text-warning mb-3"></i>
+                                        <h5>Files Email</h5>
+                                        <p>Moves the training email to its final destination folder</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-success mt-4">
+                                <h6><i class="fas fa-rocket"></i> Immediate Impact</h6>
+                                <p>Within 5 minutes of your training actions, new emails from those senders will be automatically categorized. You'll start seeing inbox cleanup results immediately!</p>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-desktop text-info"></i> Web-Based List Management</h3>
+                            </div>
+
+                            <p>While training folders provide hands-on learning, Mail-Rulez also offers a powerful web interface for direct list management:</p>
+
+                            <div class="screenshot-placeholder">
+                                <i class="fas fa-camera fa-2x text-muted mb-2"></i>
+                                <p class="text-muted"><strong>Screenshot Placeholder:</strong> Mail-Rulez web interface showing the Lists page with drag-and-drop management, search functionality, and bulk operations</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-primary text-white">
+                                            <h6 class="mb-0"><i class="fas fa-mouse-pointer"></i> Drag & Drop Management</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li>Move entries between lists by dragging</li>
+                                                <li>Visual feedback during operations</li>
+                                                <li>Automatic list updates</li>
+                                                <li>Undo functionality for mistakes</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="fas fa-search"></i> Advanced Search & Filter</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li>Search across all lists simultaneously</li>
+                                                <li>Filter by domain or sender pattern</li>
+                                                <li>Find duplicate entries</li>
+                                                <li>Quick navigation between lists</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h6 class="mb-0"><i class="fas fa-layer-group"></i> Bulk Operations</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li>Select multiple entries for batch actions</li>
+                                                <li>Mass delete unwanted entries</li>
+                                                <li>Bulk move between lists</li>
+                                                <li>Import/export list data</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-info text-white">
+                                            <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Conflict Resolution</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li>Automatic detection of conflicting entries</li>
+                                                <li>Visual warnings for overlapping lists</li>
+                                                <li>Guided resolution process</li>
+                                                <li>Priority-based conflict handling</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-balance-scale text-warning"></i> Handling List Conflicts</h3>
+                            </div>
+
+                            <p>Sometimes the same sender might appear in multiple lists. Mail-Rulez uses a clear priority system to resolve conflicts:</p>
+
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-sort-numeric-down"></i> Priority Order (Highest to Lowest)</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ol>
+                                        <li><strong class="text-danger">Blacklist</strong> - Always takes precedence for security</li>
+                                        <li><strong class="text-success">Whitelist</strong> - Trusted senders get priority</li>
+                                        <li><strong class="text-info">Vendor</strong> - Marketing emails to appropriate folder</li>
+                                        <li><strong class="text-secondary">Headhunter</strong> - Specialized job hunting category</li>
+                                    </ol>
+                                    
+                                    <div class="alert alert-warning mt-3">
+                                        <h6><i class="fas fa-shield-alt"></i> Security First</h6>
+                                        <p class="mb-0">If a sender appears in both whitelist and blacklist, <strong>blacklist always wins</strong>. This prevents potentially harmful emails from reaching your inbox, even if you previously trusted the sender.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-chart-line text-success"></i> Measuring List Effectiveness</h3>
+                            </div>
+
+                            <p>Track the impact of your list management with built-in analytics:</p>
+
+                            <div class="row">
+                                <div class="col-md-3 text-center">
+                                    <div class="card border-success">
+                                        <div class="card-body">
+                                            <i class="fas fa-inbox fa-2x text-success mb-2"></i>
+                                            <h5>Inbox Reduction</h5>
+                                            <p class="text-muted">Percentage of emails automatically filed</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <div class="card border-primary">
+                                        <div class="card-body">
+                                            <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                            <h5>List Growth</h5>
+                                            <p class="text-muted">Senders added over time</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <div class="card border-warning">
+                                        <div class="card-body">
+                                            <i class="fas fa-filter fa-2x text-warning mb-2"></i>
+                                            <h5>Processing Rate</h5>
+                                            <p class="text-muted">Emails automatically categorized</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <div class="card border-info">
+                                        <div class="card-body">
+                                            <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                                            <h5>Time Saved</h5>
+                                            <p class="text-muted">Minutes saved per day</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-lightbulb text-warning"></i> List Management Best Practices</h3>
+                            </div>
+
+                            <div class="accordion" id="bestPracticesAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#practice-start">
+                                            <i class="fas fa-play text-success me-3"></i>Getting Started Effectively
+                                        </button>
+                                    </h2>
+                                    <div id="practice-start" class="accordion-collapse collapse show" data-bs-parent="#bestPracticesAccordion">
+                                        <div class="accordion-body">
+                                            <ul>
+                                                <li><strong>Start with 15 minutes daily</strong> - Consistent small efforts are better than long sessions</li>
+                                                <li><strong>Focus on obvious choices first</strong> - Clear spam and trusted senders provide immediate impact</li>
+                                                <li><strong>Process newest emails first</strong> - These patterns are most relevant to current email traffic</li>
+                                                <li><strong>Don't overthink edge cases</strong> - You can always adjust lists later</li>
+                                                <li><strong>Use your email client's search</strong> - Find all emails from a sender before categorizing</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#practice-maintain">
+                                            <i class="fas fa-cogs text-primary me-3"></i>Ongoing Maintenance
+                                        </button>
+                                    </h2>
+                                    <div id="practice-maintain" class="accordion-collapse collapse" data-bs-parent="#bestPracticesAccordion">
+                                        <div class="accordion-body">
+                                            <ul>
+                                                <li><strong>Review pending folder weekly</strong> - Categorize unknown senders that Mail-Rulez couldn't classify</li>
+                                                <li><strong>Check processed folder monthly</strong> - Ensure important emails aren't being mis-categorized</li>
+                                                <li><strong>Clean up duplicate entries</strong> - Use the web interface to find and remove duplicates</li>
+                                                <li><strong>Update seasonal senders</strong> - Add holiday retailers, tax services during relevant periods</li>
+                                                <li><strong>Archive old vendor entries</strong> - Remove companies you no longer do business with</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#practice-advanced">
+                                            <i class="fas fa-graduation-cap text-info me-3"></i>Advanced Techniques
+                                        </button>
+                                    </h2>
+                                    <div id="practice-advanced" class="accordion-collapse collapse" data-bs-parent="#bestPracticesAccordion">
+                                        <div class="accordion-body">
+                                            <ul>
+                                                <li><strong>Domain-level categorization</strong> - Add entire domains (e.g., @company.com) instead of individual addresses</li>
+                                                <li><strong>Seasonal list management</strong> - Create temporary entries for holiday shopping, tax season</li>
+                                                <li><strong>Export and backup lists</strong> - Regular backups protect your categorization work</li>
+                                                <li><strong>Pattern recognition</strong> - Look for similar sender patterns to batch categorize</li>
+                                                <li><strong>Integration with rules</strong> - Use lists as conditions in advanced rules for complex logic</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-transition text-info"></i> Transitioning to Maintenance Mode</h3>
+                            </div>
+
+                            <p>Once your lists are well-established and your inbox is manageable, you can transition from startup mode to maintenance mode:</p>
+
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> Ready for Maintenance Mode?</h6>
+                                <p>Mail-Rulez will suggest transitioning when:</p>
+                                <ul class="mb-0">
+                                    <li>Your pending folder has fewer than 50 emails</li>
+                                    <li>You've been running startup mode for at least 2 weeks</li>
+                                    <li>The system is processing emails with less than 5% error rate</li>
+                                    <li>No recent connection or processing errors</li>
+                                </ul>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-exchange-alt"></i> Mode Differences</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6><strong>Startup Mode</strong></h6>
+                                            <ul>
+                                                <li>Processes existing emails in batches</li>
+                                                <li>Whitelisted emails move to Processed folder</li>
+                                                <li>Heavy focus on list-based learning</li>
+                                                <li>User actively trains system</li>
+                                                <li>More conservative email handling</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6><strong>Maintenance Mode</strong></h6>
+                                            <ul>
+                                                <li>Processes only new incoming emails</li>
+                                                <li>Whitelisted emails stay in Inbox</li>
+                                                <li>Rules become primary processing method</li>
+                                                <li>Lists provide baseline categorization</li>
+                                                <li>More automated, hands-off operation</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navigation -->
+                            <div class="row mt-5">
+                                <div class="col-md-6">
+                                    <div class="card border-light">
+                                        <div class="card-body text-center">
+                                            <p class="mb-0"><i class="fas fa-arrow-left text-muted"></i> <strong>Previous:</strong> <a href="#creating-rules" class="nav-link d-inline p-0" data-section="creating-rules">Creating Rules</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-light">
+                                        <div class="card-body text-center">
+                                            <p class="mb-0"><strong>Next:</strong> <a href="#troubleshooting" class="nav-link d-inline p-0" data-section="troubleshooting">Troubleshooting</a> <i class="fas fa-arrow-right text-muted"></i></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="sticky-top">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h6 class="mb-0"><i class="fas fa-list-check"></i> Quick Reference</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6><strong>Training Folders</strong></h6>
+                                        <ul class="list-unstyled ms-2">
+                                            <li><i class="text-success fas fa-circle fa-xs"></i> _whitelist → Processed</li>
+                                            <li><i class="text-danger fas fa-circle fa-xs"></i> _blacklist → Junk</li>
+                                            <li><i class="text-info fas fa-circle fa-xs"></i> _vendor → Approved Ads</li>
+                                            <li><i class="text-secondary fas fa-circle fa-xs"></i> _headhunter → HeadHunt</li>
+                                        </ul>
+                                        
+                                        <h6 class="mt-3"><strong>Processing Frequency</strong></h6>
+                                        <ul class="list-unstyled ms-2">
+                                            <li>Training folders: Every 4 minutes</li>
+                                            <li>Inbox processing: Every 5 minutes</li>
+                                            <li>List updates: Immediate</li>
+                                        </ul>
+                                        
+                                        <h6 class="mt-3"><strong>Conflict Priority</strong></h6>
+                                        <ol class="ms-2">
+                                            <li>Blacklist (highest)</li>
+                                            <li>Whitelist</li>
+                                            <li>Vendor</li>
+                                            <li>Headhunter (lowest)</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mt-3">
+                                    <div class="card-header bg-success text-white">
+                                        <h6 class="mb-0"><i class="fas fa-rocket"></i> Quick Start</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">For immediate impact:</p>
+                                        <ol class="card-text">
+                                            <li>Spend 15 minutes moving obvious spam to <code>_blacklist</code></li>
+                                            <li>Move family/friends emails to <code>_whitelist</code></li>
+                                            <li>Move store promotions to <code>_vendor</code></li>
+                                            <li>Wait 5 minutes and see results!</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="troubleshooting" class="content-section">
                     <h2><i class="fas fa-tools text-primary"></i> Troubleshooting</h2>
-                    <p>Troubleshooting content will be added here...</p>
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <p class="lead">When Mail-Rulez isn't working as expected, this troubleshooting guide will help you quickly identify and resolve common issues. Most problems fall into a few categories that are easy to diagnose and fix.</p>
+                            
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-phone-alt"></i> Need More Help?</h6>
+                                <p class="mb-0">If these solutions don't resolve your issue, check the system logs in the web interface or contact support with specific error messages and your configuration details.</p>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-key text-warning"></i> Password Recovery</h3>
+                            </div>
+
+                            <p>Mail-Rulez provides two methods for password recovery if you're locked out of the admin interface:</p>
+
+                            <div class="accordion" id="passwordRecoveryAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#web-password-reset">
+                                            <i class="fas fa-globe text-primary me-3"></i>Method 1: Web Interface Password Reset (Recommended)
+                                        </button>
+                                    </h2>
+                                    <div id="web-password-reset" class="accordion-collapse collapse show" data-bs-parent="#passwordRecoveryAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Use this method when the web interface is accessible but you've forgotten your password:</strong></p>
+                                            <ol>
+                                                <li><strong>Navigate to password reset:</strong> Go to <code>/auth/password-reset/request</code> in your browser</li>
+                                                <li><strong>Enter admin username:</strong> Type your admin username to generate a reset token</li>
+                                                <li><strong>Copy the reset token:</strong> You'll be redirected to a dedicated token display page with a copy button</li>
+                                                <li><strong>Continue to reset form:</strong> Click "Continue to Reset Password" (token auto-populated)</li>
+                                                <li><strong>Set new password:</strong> Enter and confirm your new password to complete the reset</li>
+                                            </ol>
+                                            
+                                            <div class="alert alert-success">
+                                                <h6><i class="fas fa-shield-alt"></i> Security Features</h6>
+                                                <ul class="mb-0">
+                                                    <li>Reset tokens are encrypted and expire after 1 hour</li>
+                                                    <li>Tokens are single-use and cannot be reused</li>
+                                                    <li>All password resets are logged in security logs</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cli-password-reset">
+                                            <i class="fas fa-terminal text-secondary me-3"></i>Method 2: CLI Password Reset (Emergency)
+                                        </button>
+                                    </h2>
+                                    <div id="cli-password-reset" class="accordion-collapse collapse" data-bs-parent="#passwordRecoveryAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Use this method when the web interface is completely inaccessible:</strong></p>
+                                            
+                                            <div class="alert alert-warning">
+                                                <strong>Requirements:</strong> You need physical or SSH access to the server running Mail-Rulez.
+                                            </div>
+                                            
+                                            <h6><strong>For Local Installation:</strong></h6>
+                                            <div class="code-block">
+# Navigate to Mail-Rulez directory
+cd /path/to/mail-rulez
+
+# Run the password reset tool
+python admin_password_reset.py
+                                            </div>
+                                            
+                                            <h6><strong>For Virtual Environment:</strong></h6>
+                                            <div class="code-block">
+# Activate virtual environment
+source ~/virtual-envs/mail-rulez/bin/activate
+
+# Run password reset
+python admin_password_reset.py
+                                            </div>
+                                            
+                                            <h6><strong>For Docker Installation:</strong></h6>
+                                            <div class="code-block">
+# Access running container
+docker exec -it mail-rulez-container bash
+
+# Run password reset inside container
+python admin_password_reset.py
+                                            </div>
+                                            
+                                            <p class="mt-3">Follow the prompts to create a new admin password. The tool will update the <code>.admin_user</code> file with your new credentials.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-plug text-danger"></i> Connection Issues</h3>
+                            </div>
+
+                            <p>Connection problems are the most common issues with Mail-Rulez. Here's how to diagnose and fix them:</p>
+
+                            <div class="accordion" id="connectionIssuesAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#imap-connection-failed">
+                                            <i class="fas fa-exclamation-triangle text-danger me-3"></i>IMAP Connection Failed
+                                        </button>
+                                    </h2>
+                                    <div id="imap-connection-failed" class="accordion-collapse collapse show" data-bs-parent="#connectionIssuesAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> "Connection failed", "Login failed", or timeout errors</p>
+                                            
+                                            <h6><strong>Check These Items:</strong></h6>
+                                            <ol>
+                                                <li><strong>Server address and port:</strong>
+                                                    <ul>
+                                                        <li>Gmail: <code>imap.gmail.com:993</code> (SSL)</li>
+                                                        <li>Outlook: <code>outlook.office365.com:993</code> (SSL)</li>
+                                                        <li>Yahoo: <code>imap.mail.yahoo.com:993</code> (SSL)</li>
+                                                    </ul>
+                                                </li>
+                                                <li><strong>App passwords:</strong> Most providers require app-specific passwords instead of your regular password</li>
+                                                <li><strong>Two-factor authentication:</strong> Must be enabled before generating app passwords</li>
+                                                <li><strong>Security settings:</strong> Verify SSL/TLS is enabled (recommended)</li>
+                                                <li><strong>Firewall/network:</strong> Ensure port 993 (SSL) or 143 (non-SSL) is not blocked</li>
+                                            </ol>
+                                            
+                                            <div class="alert alert-info">
+                                                <h6><i class="fas fa-test-tube"></i> Test Your Connection</h6>
+                                                <p class="mb-0">Use the "Test Connection" button in the account setup form to verify your credentials before saving the account configuration.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ssl-certificate-errors">
+                                            <i class="fas fa-certificate text-warning me-3"></i>SSL Certificate Errors
+                                        </button>
+                                    </h2>
+                                    <div id="ssl-certificate-errors" class="accordion-collapse collapse" data-bs-parent="#connectionIssuesAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> "SSL certificate verification failed", "Certificate error"</p>
+                                            
+                                            <h6><strong>Solutions:</strong></h6>
+                                            <ul>
+                                                <li><strong>Update system certificates:</strong> Ensure your server has current SSL certificates</li>
+                                                <li><strong>Check server time:</strong> Incorrect system time can cause certificate validation failures</li>
+                                                <li><strong>Corporate networks:</strong> Some corporate firewalls intercept SSL connections</li>
+                                                <li><strong>Provider changes:</strong> Email providers occasionally update their SSL certificates</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-warning">
+                                                <strong>Security Note:</strong> Only disable SSL certificate verification as a last resort and temporary measure. Always re-enable it once the issue is resolved.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#timeout-issues">
+                                            <i class="fas fa-clock text-info me-3"></i>Connection Timeouts
+                                        </button>
+                                    </h2>
+                                    <div id="timeout-issues" class="accordion-collapse collapse" data-bs-parent="#connectionIssuesAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> "Connection timeout", slow responses, intermittent failures</p>
+                                            
+                                            <h6><strong>Common Causes & Solutions:</strong></h6>
+                                            <ul>
+                                                <li><strong>Network congestion:</strong> Try running Mail-Rulez during off-peak hours</li>
+                                                <li><strong>Provider rate limiting:</strong> Some email providers limit connection frequency</li>
+                                                <li><strong>Large mailboxes:</strong> Processing thousands of emails can take time</li>
+                                                <li><strong>Server resources:</strong> Ensure your server has adequate CPU and memory</li>
+                                                <li><strong>Distance/latency:</strong> International connections may be slower</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-info">
+                                                <h6><i class="fas fa-cogs"></i> Adjustment Options</h6>
+                                                <p class="mb-0">You can adjust processing intervals and batch sizes in the service configuration to reduce server load and improve reliability.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-folder-open text-warning"></i> Training Folder Issues</h3>
+                            </div>
+
+                            <p>Problems with training folders can prevent Mail-Rulez from learning your email preferences:</p>
+
+                            <div class="accordion" id="trainingFolderIssuesAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#folders-not-created">
+                                            <i class="fas fa-folder-plus text-warning me-3"></i>Training Folders Not Created
+                                        </button>
+                                    </h2>
+                                    <div id="folders-not-created" class="accordion-collapse collapse show" data-bs-parent="#trainingFolderIssuesAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> Cannot find <code>_whitelist</code>, <code>_blacklist</code>, <code>_vendor</code>, or <code>_headhunter</code> folders</p>
+                                            
+                                            <h6><strong>Solutions:</strong></h6>
+                                            <ol>
+                                                <li><strong>Check folder creation status:</strong> Go to Accounts → [Your Account] → "Create Folders"</li>
+                                                <li><strong>Verify permissions:</strong> Ensure your IMAP account can create folders</li>
+                                                <li><strong>Manual creation:</strong> Create folders manually in your email client if automatic creation fails</li>
+                                                <li><strong>Check folder names:</strong> Ensure exact naming: <code>_whitelist</code>, <code>_blacklist</code>, <code>_vendor</code>, <code>_headhunter</code></li>
+                                                <li><strong>Folder hierarchy:</strong> Some providers require folders under INBOX (e.g., <code>INBOX._whitelist</code>)</li>
+                                            </ol>
+                                            
+                                            <div class="alert alert-info">
+                                                <h6><i class="fas fa-lightbulb"></i> Provider-Specific Notes</h6>
+                                                <ul class="mb-0">
+                                                    <li><strong>Gmail:</strong> Folders appear as labels, may take a few minutes to sync</li>
+                                                    <li><strong>Outlook:</strong> Folders created under Inbox by default</li>
+                                                    <li><strong>Yahoo:</strong> May require manual folder creation in web interface</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#emails-not-processing">
+                                            <i class="fas fa-envelope-open text-danger me-3"></i>Emails Not Processing from Training Folders
+                                        </button>
+                                    </h2>
+                                    <div id="emails-not-processing" class="accordion-collapse collapse" data-bs-parent="#trainingFolderIssuesAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> Emails moved to training folders remain there, no list updates</p>
+                                            
+                                            <h6><strong>Troubleshooting Steps:</strong></h6>
+                                            <ol>
+                                                <li><strong>Check service status:</strong> Verify Mail-Rulez processing service is running</li>
+                                                <li><strong>Wait for processing cycle:</strong> Training folders are checked every 4 minutes</li>
+                                                <li><strong>Check logs:</strong> Look for processing errors in the web interface logs</li>
+                                                <li><strong>Verify folder permissions:</strong> Ensure Mail-Rulez can read from and move emails in training folders</li>
+                                                <li><strong>Restart service:</strong> Stop and start the email processing service</li>
+                                            </ol>
+                                            
+                                            <div class="alert alert-warning">
+                                                <strong>Common Issue:</strong> If you move emails to training folders while Mail-Rulez is processing, there might be a brief delay. Wait for the next processing cycle.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#wrong-categorization">
+                                            <i class="fas fa-random text-info me-3"></i>Emails Being Categorized Incorrectly
+                                        </button>
+                                    </h2>
+                                    <div id="wrong-categorization" class="accordion-collapse collapse" data-bs-parent="#trainingFolderIssuesAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> Important emails going to Junk, spam going to Processed, etc.</p>
+                                            
+                                            <h6><strong>Diagnosis & Solutions:</strong></h6>
+                                            <ul>
+                                                <li><strong>Check list conflicts:</strong> Same sender might be in multiple lists (blacklist overrides whitelist)</li>
+                                                <li><strong>Review list entries:</strong> Use the web interface to examine and clean up list contents</li>
+                                                <li><strong>Domain vs. address:</strong> Domain entries might override specific address entries</li>
+                                                <li><strong>Recent changes:</strong> Training folder actions update lists immediately</li>
+                                                <li><strong>Rule interference:</strong> Custom rules might override list-based categorization</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-success">
+                                                <h6><i class="fas fa-undo"></i> Quick Fix</h6>
+                                                <p class="mb-0">Move incorrectly categorized emails to the appropriate training folder to retrain the system. The correction will take effect within 5 minutes.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-exchange-alt text-info"></i> Mode Transition Problems</h3>
+                            </div>
+
+                            <p>Issues when switching between startup and maintenance modes:</p>
+
+                            <div class="accordion" id="modeTransitionAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#stuck-startup-mode">
+                                            <i class="fas fa-play text-primary me-3"></i>Stuck in Startup Mode
+                                        </button>
+                                    </h2>
+                                    <div id="stuck-startup-mode" class="accordion-collapse collapse show" data-bs-parent="#modeTransitionAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> Mail-Rulez won't transition to maintenance mode automatically</p>
+                                            
+                                            <h6><strong>Transition Requirements:</strong></h6>
+                                            <ul>
+                                                <li>Pending folder has fewer than 50 emails</li>
+                                                <li>Running in startup mode for at least 2 weeks</li>
+                                                <li>Processing emails with less than 5% error rate</li>
+                                                <li>No recent connection or processing errors</li>
+                                            </ul>
+                                            
+                                            <h6><strong>Manual Solutions:</strong></h6>
+                                            <ol>
+                                                <li><strong>Clean up pending folder:</strong> Manually categorize unknown senders</li>
+                                                <li><strong>Fix processing errors:</strong> Resolve any connection or permission issues</li>
+                                                <li><strong>Wait longer:</strong> Some mailboxes need more time to stabilize</li>
+                                                <li><strong>Force transition:</strong> Use the web interface to manually switch modes</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#maintenance-mode-issues">
+                                            <i class="fas fa-cogs text-warning me-3"></i>Maintenance Mode Not Working
+                                        </button>
+                                    </h2>
+                                    <div id="maintenance-mode-issues" class="accordion-collapse collapse" data-bs-parent="#modeTransitionAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> New emails not being processed, inbox filling up again</p>
+                                            
+                                            <h6><strong>Check These Items:</strong></h6>
+                                            <ul>
+                                                <li><strong>Service status:</strong> Verify the processing service is running in maintenance mode</li>
+                                                <li><strong>Processing intervals:</strong> Maintenance mode processes emails every 5 minutes</li>
+                                                <li><strong>List completeness:</strong> Ensure your lists cover most common senders</li>
+                                                <li><strong>Rule conflicts:</strong> Custom rules might interfere with list-based processing</li>
+                                                <li><strong>Folder permissions:</strong> Check that Mail-Rulez can still access all folders</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-info">
+                                                <h6><i class="fas fa-chart-line"></i> Expected Behavior</h6>
+                                                <p class="mb-0">In maintenance mode, whitelisted emails stay in your Inbox while blacklisted and vendor emails are automatically filed. Some manual sorting is normal.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-cogs text-secondary"></i> Processing Service Issues</h3>
+                            </div>
+
+                            <p>When the background email processing service encounters problems:</p>
+
+                            <div class="accordion" id="serviceIssuesAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#service-not-starting">
+                                            <i class="fas fa-play-circle text-danger me-3"></i>Service Won't Start
+                                        </button>
+                                    </h2>
+                                    <div id="service-not-starting" class="accordion-collapse collapse show" data-bs-parent="#serviceIssuesAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> Processing service shows "Stopped" or "Error" status</p>
+                                            
+                                            <h6><strong>Diagnostic Steps:</strong></h6>
+                                            <ol>
+                                                <li><strong>Check service logs:</strong> Look for specific error messages in the web interface</li>
+                                                <li><strong>Verify account configuration:</strong> Ensure account credentials are correct</li>
+                                                <li><strong>Test IMAP connection:</strong> Use the connection test feature</li>
+                                                <li><strong>Check folder permissions:</strong> Verify all required folders exist and are accessible</li>
+                                                <li><strong>Restart service:</strong> Stop and start the service to clear temporary issues</li>
+                                            </ol>
+                                            
+                                            <div class="alert alert-warning">
+                                                <strong>Security Lock:</strong> After 5 consecutive errors, the service will stop automatically to prevent account lockouts. Fix the underlying issue before restarting.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#service-frequent-errors">
+                                            <i class="fas fa-exclamation-circle text-warning me-3"></i>Frequent Processing Errors
+                                        </button>
+                                    </h2>
+                                    <div id="service-frequent-errors" class="accordion-collapse collapse" data-bs-parent="#serviceIssuesAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Symptoms:</strong> Service runs but shows high error rates or frequent restarts</p>
+                                            
+                                            <h6><strong>Common Causes & Solutions:</strong></h6>
+                                            <ul>
+                                                <li><strong>Network instability:</strong> Check your internet connection stability</li>
+                                                <li><strong>Provider rate limiting:</strong> Reduce processing frequency or batch sizes</li>
+                                                <li><strong>Large email attachments:</strong> Some emails might timeout during processing</li>
+                                                <li><strong>Corrupted emails:</strong> Malformed emails can cause processing failures</li>
+                                                <li><strong>System resources:</strong> Ensure adequate CPU and memory are available</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-info">
+                                                <h6><i class="fas fa-chart-bar"></i> Monitoring Tips</h6>
+                                                <p class="mb-0">Monitor the error rate in the dashboard. Rates above 5% indicate issues that need attention. Temporary spikes are normal during network issues.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-search text-info"></i> Getting Detailed Diagnostic Information</h3>
+                            </div>
+
+                            <p>For complex issues, gather detailed information to help with troubleshooting:</p>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-info text-white">
+                                            <h6 class="mb-0"><i class="fas fa-file-alt"></i> Log Files to Check</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li><strong>Application logs:</strong> Main processing errors and status</li>
+                                                <li><strong>Security logs:</strong> Authentication and access issues</li>
+                                                <li><strong>Connection logs:</strong> IMAP connection attempts and failures</li>
+                                                <li><strong>Processing logs:</strong> Email categorization and folder operations</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="fas fa-info-circle"></i> Information to Collect</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li><strong>Email provider:</strong> Gmail, Outlook, Yahoo, etc.</li>
+                                                <li><strong>Installation method:</strong> Docker, virtual environment, local</li>
+                                                <li><strong>Error messages:</strong> Exact text of error messages</li>
+                                                <li><strong>Timing:</strong> When the issue started occurring</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="fas fa-terminal"></i> Useful Diagnostic Commands</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6><strong>For Docker Installations:</strong></h6>
+                                        <div class="code-block">
+# Check container status
+docker ps -a | grep mail-rulez
+
+# View container logs
+docker logs mail-rulez-container
+
+# Access container for debugging
+docker exec -it mail-rulez-container bash
+                                        </div>
+                                        
+                                        <h6><strong>For Local Installations:</strong></h6>
+                                        <div class="code-block">
+# Check Python dependencies
+pip list | grep -E "(imap|email|flask)"
+
+# Test mail server connectivity
+telnet imap.gmail.com 993
+
+# Check system resources
+free -h && df -h
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navigation -->
+                            <div class="row mt-5">
+                                <div class="col-md-6">
+                                    <div class="card border-light">
+                                        <div class="card-body text-center">
+                                            <p class="mb-0"><i class="fas fa-arrow-left text-muted"></i> <strong>Previous:</strong> <a href="#list-management" class="nav-link d-inline p-0" data-section="list-management">List Management</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-light">
+                                        <div class="card-body text-center">
+                                            <p class="mb-0"><strong>Next:</strong> <a href="#security" class="nav-link d-inline p-0" data-section="security">Security</a> <i class="fas fa-arrow-right text-muted"></i></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="sticky-top">
+                                <div class="card">
+                                    <div class="card-header bg-danger text-white">
+                                        <h6 class="mb-0"><i class="fas fa-first-aid"></i> Quick Fixes</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6><strong>Can't Login?</strong></h6>
+                                        <p class="small">Use password reset at <code>/auth/password-reset/request</code> or run <code>python admin_password_reset.py</code></p>
+                                        
+                                        <h6><strong>Connection Failed?</strong></h6>
+                                        <p class="small">Check server address, port, and app password. Test connection before saving.</p>
+                                        
+                                        <h6><strong>Emails Not Moving?</strong></h6>
+                                        <p class="small">Wait 4-5 minutes for processing cycle. Check service status and logs.</p>
+                                        
+                                        <h6><strong>Wrong Categorization?</strong></h6>
+                                        <p class="small">Move email to correct training folder. Check for list conflicts in web interface.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mt-3">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h6 class="mb-0"><i class="fas fa-tools"></i> Emergency Steps</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <ol class="small">
+                                            <li>Check service status in dashboard</li>
+                                            <li>Review recent logs for errors</li>
+                                            <li>Test IMAP connection</li>
+                                            <li>Restart processing service</li>
+                                            <li>If still stuck, restart Mail-Rulez</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mt-3">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="mb-0"><i class="fas fa-life-ring"></i> Get Help</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text small">For issues not covered here:</p>
+                                        <ul class="small">
+                                            <li>Check application logs in web interface</li>
+                                            <li>Note exact error messages</li>
+                                            <li>Document steps to reproduce</li>
+                                            <li>Include your email provider details</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="security" class="content-section">
                     <h2><i class="fas fa-shield-alt text-primary"></i> Security</h2>
-                    <p>Security content will be added here...</p>
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <p class="lead">Mail-Rulez is designed with security as a core principle. Whether you're self-hosting or using RealPM's hosted service, your email data and credentials are protected through multiple layers of security.</p>
+                            
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-shield-check"></i> Security Philosophy</h6>
+                                <p class="mb-0">Mail-Rulez processes your emails <strong>locally</strong> or on infrastructure you control. Your email content never passes through third-party services, and your IMAP credentials are encrypted and stored securely.</p>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-server text-primary"></i> Local vs. Hosted Deployment Security</h3>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card border-primary h-100">
+                                        <div class="card-header bg-primary text-white">
+                                            <h6 class="mb-0"><i class="fas fa-home"></i> Self-Hosted Security</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <h6><strong>Advantages:</strong></h6>
+                                            <ul>
+                                                <li>Complete control over your data</li>
+                                                <li>No third-party access to emails</li>
+                                                <li>Custom security configurations</li>
+                                                <li>Network isolation capabilities</li>
+                                                <li>Direct IMAP connections</li>
+                                            </ul>
+                                            
+                                            <h6><strong>Your Responsibilities:</strong></h6>
+                                            <ul>
+                                                <li>Server security and updates</li>
+                                                <li>Network firewall configuration</li>
+                                                <li>SSL certificate management</li>
+                                                <li>Backup and disaster recovery</li>
+                                                <li>Access control and monitoring</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-success h-100">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="fas fa-cloud"></i> RealPM Hosted Security</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <h6><strong>Professional Infrastructure:</strong></h6>
+                                            <ul>
+                                                <li>Enterprise-grade data centers</li>
+                                                <li>24/7 security monitoring</li>
+                                                <li>Automated security updates</li>
+                                                <li>Professional backup systems</li>
+                                                <li>DDoS protection and firewalls</li>
+                                            </ul>
+                                            
+                                            <h6><strong>Managed Services:</strong></h6>
+                                            <ul>
+                                                <li>Security patch management</li>
+                                                <li>Infrastructure monitoring</li>
+                                                <li>Automated failover systems</li>
+                                                <li>Compliance certifications</li>
+                                                <li>Professional support team</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-lock text-warning"></i> Data Protection & Encryption</h3>
+                            </div>
+
+                            <p>Mail-Rulez implements multiple layers of encryption to protect your sensitive information:</p>
+
+                            <div class="accordion" id="encryptionAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#credential-encryption">
+                                            <i class="fas fa-key text-primary me-3"></i>IMAP Credential Encryption
+                                        </button>
+                                    </h2>
+                                    <div id="credential-encryption" class="accordion-collapse collapse show" data-bs-parent="#encryptionAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>How Your Email Passwords Are Protected:</strong></p>
+                                            <ul>
+                                                <li><strong>Master Key Encryption:</strong> All IMAP credentials are encrypted using a master key</li>
+                                                <li><strong>Secure Storage:</strong> Encrypted credentials stored in <code>secure_config.json</code></li>
+                                                <li><strong>Memory Protection:</strong> Credentials decrypted only when needed for connections</li>
+                                                <li><strong>No Plain Text:</strong> Passwords never stored in readable format</li>
+                                                <li><strong>Environment Variables:</strong> Master key can be stored separately from application</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-info">
+                                                <h6><i class="fas fa-lightbulb"></i> Security Tip</h6>
+                                                <p class="mb-0">Use app-specific passwords instead of your main email password. These can be revoked without changing your primary credentials and provide better access control.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#transport-encryption">
+                                            <i class="fas fa-shield-alt text-success me-3"></i>Transport Layer Security
+                                        </button>
+                                    </h2>
+                                    <div id="transport-encryption" class="accordion-collapse collapse" data-bs-parent="#encryptionAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Protecting Data in Transit:</strong></p>
+                                            <ul>
+                                                <li><strong>IMAP over SSL/TLS:</strong> All email server connections use encrypted protocols</li>
+                                                <li><strong>HTTPS Web Interface:</strong> Web dashboard secured with SSL certificates</li>
+                                                <li><strong>Certificate Validation:</strong> Automatic verification of server certificates</li>
+                                                <li><strong>Strong Cipher Suites:</strong> Modern encryption algorithms only</li>
+                                                <li><strong>Perfect Forward Secrecy:</strong> Session keys cannot be compromised retroactively</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-warning">
+                                                <h6><i class="fas fa-exclamation-triangle"></i> Network Security</h6>
+                                                <p class="mb-0">Avoid connecting to email servers over unsecured networks. Use VPN when accessing Mail-Rulez from public WiFi or untrusted networks.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#data-at-rest">
+                                            <i class="fas fa-database text-info me-3"></i>Data at Rest Protection
+                                        </button>
+                                    </h2>
+                                    <div id="data-at-rest" class="accordion-collapse collapse" data-bs-parent="#encryptionAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Local Data Security:</strong></p>
+                                            <ul>
+                                                <li><strong>Configuration Encryption:</strong> Account settings encrypted on disk</li>
+                                                <li><strong>List File Protection:</strong> Sender lists stored securely</li>
+                                                <li><strong>Log File Security:</strong> Sensitive information filtered from logs</li>
+                                                <li><strong>Temporary File Cleanup:</strong> Automatic removal of temporary data</li>
+                                                <li><strong>File System Permissions:</strong> Restricted access to application files</li>
+                                            </ul>
+                                            
+                                            <div class="alert alert-success">
+                                                <h6><i class="fas fa-info-circle"></i> Email Content Policy</h6>
+                                                <p class="mb-0">Mail-Rulez <strong>does not store email content</strong> locally. Only metadata (sender, subject, classification) is retained for processing rules and analytics.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-user-shield text-success"></i> Access Control & Authentication</h3>
+                            </div>
+
+                            <p>Mail-Rulez implements robust authentication and access control mechanisms:</p>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="fas fa-sign-in-alt"></i> Authentication Features</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li><strong>Secure Password Hashing:</strong> Bcrypt with salt for admin passwords</li>
+                                                <li><strong>Session Management:</strong> Secure session tokens with expiration</li>
+                                                <li><strong>CSRF Protection:</strong> Cross-site request forgery prevention</li>
+                                                <li><strong>Password Reset Tokens:</strong> Encrypted, time-limited reset capability</li>
+                                                <li><strong>Failed Login Protection:</strong> Automatic lockout after attempts</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-primary text-white">
+                                            <h6 class="mb-0"><i class="fas fa-lock"></i> Access Control</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li><strong>Admin-Only Access:</strong> All configuration requires authentication</li>
+                                                <li><strong>Role-Based Security:</strong> Granular permissions for different functions</li>
+                                                <li><strong>API Security:</strong> Protected endpoints with authentication</li>
+                                                <li><strong>File System Isolation:</strong> Application runs with minimal privileges</li>
+                                                <li><strong>Network Binding:</strong> Configurable interface binding for security</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-eye text-info"></i> Privacy & Data Handling</h3>
+                            </div>
+
+                            <p>Your privacy is fundamental to Mail-Rulez's design and operation:</p>
+
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-user-secret"></i> Privacy Commitments</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6><strong>What We DON'T Do:</strong></h6>
+                                            <ul>
+                                                <li>Store or read your email content</li>
+                                                <li>Share your data with third parties</li>
+                                                <li>Analyze your emails for advertising</li>
+                                                <li>Track your email usage patterns</li>
+                                                <li>Retain unnecessary personal information</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6><strong>What We DO:</strong></h6>
+                                            <ul>
+                                                <li>Process emails locally on your infrastructure</li>
+                                                <li>Store only configuration and sender lists</li>
+                                                <li>Encrypt all stored credentials</li>
+                                                <li>Provide audit logs for transparency</li>
+                                                <li>Enable complete data deletion</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-4">
+                                <h6><i class="fas fa-balance-scale"></i> GDPR & Compliance</h6>
+                                <p class="mb-0">Mail-Rulez is designed to support GDPR compliance through data minimization, encryption, and the right to deletion. For hosted services, RealPM maintains comprehensive compliance documentation.</p>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-shield-virus text-danger"></i> Threat Protection</h3>
+                            </div>
+
+                            <p>Mail-Rulez includes protection against common security threats:</p>
+
+                            <div class="accordion" id="threatProtectionAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#injection-protection">
+                                            <i class="fas fa-syringe text-danger me-3"></i>Injection Attack Prevention
+                                        </button>
+                                    </h2>
+                                    <div id="injection-protection" class="accordion-collapse collapse show" data-bs-parent="#threatProtectionAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Protection Mechanisms:</strong></p>
+                                            <ul>
+                                                <li><strong>Input Validation:</strong> All user inputs validated and sanitized</li>
+                                                <li><strong>SQL Injection Prevention:</strong> Parameterized queries and ORM usage</li>
+                                                <li><strong>Command Injection Protection:</strong> No direct system command execution</li>
+                                                <li><strong>Path Traversal Prevention:</strong> Restricted file system access</li>
+                                                <li><strong>XSS Protection:</strong> Content Security Policy and output escaping</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#dos-protection">
+                                            <i class="fas fa-shield text-warning me-3"></i>Denial of Service Protection
+                                        </button>
+                                    </h2>
+                                    <div id="dos-protection" class="accordion-collapse collapse" data-bs-parent="#threatProtectionAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Availability Protections:</strong></p>
+                                            <ul>
+                                                <li><strong>Rate Limiting:</strong> Connection and request throttling</li>
+                                                <li><strong>Resource Management:</strong> CPU and memory usage controls</li>
+                                                <li><strong>Connection Timeouts:</strong> Automatic cleanup of stale connections</li>
+                                                <li><strong>Error Recovery:</strong> Graceful handling of service failures</li>
+                                                <li><strong>Circuit Breakers:</strong> Automatic service protection during overload</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#email-security">
+                                            <i class="fas fa-envelope-open-text text-info me-3"></i>Email-Specific Security
+                                        </button>
+                                    </h2>
+                                    <div id="email-security" class="accordion-collapse collapse" data-bs-parent="#threatProtectionAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Email Processing Security:</strong></p>
+                                            <ul>
+                                                <li><strong>Malicious Attachment Protection:</strong> No automatic execution of attachments</li>
+                                                <li><strong>Header Validation:</strong> Email header parsing with security checks</li>
+                                                <li><strong>Encoding Safety:</strong> Proper handling of various email encodings</li>
+                                                <li><strong>Phishing Detection:</strong> Suspicious sender pattern recognition</li>
+                                                <li><strong>Content Filtering:</strong> Safe processing of potentially harmful content</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-cogs text-secondary"></i> Security Configuration</h3>
+                            </div>
+
+                            <p>Configure Mail-Rulez security settings to match your requirements:</p>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-secondary text-white">
+                                            <h6 class="mb-0"><i class="fas fa-sliders-h"></i> Configuration Options</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li><strong>SSL/TLS Settings:</strong> Configure encryption requirements</li>
+                                                <li><strong>Session Timeouts:</strong> Customize authentication duration</li>
+                                                <li><strong>Network Binding:</strong> Restrict interface access</li>
+                                                <li><strong>Log Levels:</strong> Control information logging</li>
+                                                <li><strong>Backup Encryption:</strong> Secure configuration backups</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Security Best Practices</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="mb-0">
+                                                <li><strong>Strong Passwords:</strong> Use complex admin passwords</li>
+                                                <li><strong>Regular Updates:</strong> Keep Mail-Rulez updated</li>
+                                                <li><strong>Network Security:</strong> Use firewalls and VPNs</li>
+                                                <li><strong>Access Logging:</strong> Monitor authentication events</li>
+                                                <li><strong>Backup Security:</strong> Encrypt configuration backups</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-file-alt text-primary"></i> Security Auditing & Compliance</h3>
+                            </div>
+
+                            <p>Mail-Rulez provides comprehensive logging and auditing capabilities:</p>
+
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-clipboard-list"></i> Audit Trail Features</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <h6><strong>Authentication Logs</strong></h6>
+                                            <ul>
+                                                <li>Login attempts and failures</li>
+                                                <li>Password reset activities</li>
+                                                <li>Session creation and expiration</li>
+                                                <li>Access control decisions</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6><strong>Configuration Changes</strong></h6>
+                                            <ul>
+                                                <li>Account additions and modifications</li>
+                                                <li>Rule and list updates</li>
+                                                <li>Security setting changes</li>
+                                                <li>Service start/stop events</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6><strong>Processing Activity</strong></h6>
+                                            <ul>
+                                                <li>Email categorization decisions</li>
+                                                <li>IMAP connection events</li>
+                                                <li>Error conditions and recovery</li>
+                                                <li>Performance and resource usage</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-success mt-4">
+                                <h6><i class="fas fa-certificate"></i> Hosted Service Compliance</h6>
+                                <p class="mb-0">RealPM's hosted Mail-Rulez service maintains SOC 2 Type II compliance, regular security audits, and comprehensive documentation for enterprise security requirements.</p>
+                            </div>
+
+                            <div class="mt-5 mb-4">
+                                <h3><i class="fas fa-question-circle text-info"></i> Security FAQ</h3>
+                            </div>
+
+                            <div class="accordion" id="securityFaqAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-credentials">
+                                            <i class="fas fa-key text-primary me-3"></i>How are my email credentials protected?
+                                        </button>
+                                    </h2>
+                                    <div id="faq-credentials" class="accordion-collapse collapse show" data-bs-parent="#securityFaqAccordion">
+                                        <div class="accordion-body">
+                                            <p>Your IMAP credentials are encrypted using industry-standard encryption before being stored. The encryption key is stored separately and can be protected with environment variables. Even if someone gains access to the configuration files, they cannot read your passwords without the encryption key.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-email-content">
+                                            <i class="fas fa-envelope text-success me-3"></i>Does Mail-Rulez store my email content?
+                                        </button>
+                                    </h2>
+                                    <div id="faq-email-content" class="accordion-collapse collapse" data-bs-parent="#securityFaqAccordion">
+                                        <div class="accordion-body">
+                                            <p>No. Mail-Rulez only stores metadata needed for categorization (sender addresses, subjects for rules) and your configuration preferences. Email content remains on your email server and is processed in memory only during categorization.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-network-security">
+                                            <i class="fas fa-network-wired text-warning me-3"></i>What network security should I implement?
+                                        </button>
+                                    </h2>
+                                    <div id="faq-network-security" class="accordion-collapse collapse" data-bs-parent="#securityFaqAccordion">
+                                        <div class="accordion-body">
+                                            <p>For self-hosted deployments: Use firewalls to restrict access to Mail-Rulez ports, implement VPN access for remote administration, keep the server updated, and use HTTPS with valid SSL certificates. Consider placing Mail-Rulez behind a reverse proxy for additional security.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-compliance">
+                                            <i class="fas fa-balance-scale text-info me-3"></i>Is Mail-Rulez suitable for compliance requirements?
+                                        </button>
+                                    </h2>
+                                    <div id="faq-compliance" class="accordion-collapse collapse" data-bs-parent="#securityFaqAccordion">
+                                        <div class="accordion-body">
+                                            <p>Yes. Mail-Rulez supports GDPR through data minimization and encryption. For industries with specific compliance needs (HIPAA, SOX, etc.), the self-hosted option provides complete control over data handling. RealPM's hosted service maintains professional compliance certifications.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navigation -->
+                            <div class="row mt-5">
+                                <div class="col-md-6">
+                                    <div class="card border-light">
+                                        <div class="card-body text-center">
+                                            <p class="mb-0"><i class="fas fa-arrow-left text-muted"></i> <strong>Previous:</strong> <a href="#troubleshooting" class="nav-link d-inline p-0" data-section="troubleshooting">Troubleshooting</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-light">
+                                        <div class="card-body text-center">
+                                            <p class="mb-0 text-muted">End of Documentation</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="sticky-top">
+                                <div class="card">
+                                    <div class="card-header bg-success text-white">
+                                        <h6 class="mb-0"><i class="fas fa-shield-check"></i> Security Summary</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6><strong>Data Protection</strong></h6>
+                                        <ul class="small">
+                                            <li>Encrypted credential storage</li>
+                                            <li>SSL/TLS for all connections</li>
+                                            <li>No email content retention</li>
+                                            <li>Secure session management</li>
+                                        </ul>
+                                        
+                                        <h6><strong>Access Control</strong></h6>
+                                        <ul class="small">
+                                            <li>Admin authentication required</li>
+                                            <li>CSRF protection enabled</li>
+                                            <li>Failed login lockouts</li>
+                                            <li>Audit trail logging</li>
+                                        </ul>
+                                        
+                                        <h6><strong>Privacy</strong></h6>
+                                        <ul class="small">
+                                            <li>Local processing only</li>
+                                            <li>No third-party data sharing</li>
+                                            <li>GDPR compliance support</li>
+                                            <li>Complete data deletion</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mt-3">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Security Checklist</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-check small">
+                                            <input class="form-check-input" type="checkbox" id="check1">
+                                            <label class="form-check-label" for="check1">Use app passwords for email accounts</label>
+                                        </div>
+                                        <div class="form-check small">
+                                            <input class="form-check-input" type="checkbox" id="check2">
+                                            <label class="form-check-label" for="check2">Enable HTTPS for web interface</label>
+                                        </div>
+                                        <div class="form-check small">
+                                            <input class="form-check-input" type="checkbox" id="check3">
+                                            <label class="form-check-label" for="check3">Configure firewall rules</label>
+                                        </div>
+                                        <div class="form-check small">
+                                            <input class="form-check-input" type="checkbox" id="check4">
+                                            <label class="form-check-label" for="check4">Set strong admin password</label>
+                                        </div>
+                                        <div class="form-check small">
+                                            <input class="form-check-input" type="checkbox" id="check5">
+                                            <label class="form-check-label" for="check5">Regular security updates</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mt-3">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="mb-0"><i class="fas fa-phone-alt"></i> Security Support</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text small">For security questions or to report vulnerabilities:</p>
+                                        <ul class="small">
+                                            <li>Review security logs in web interface</li>
+                                            <li>Check audit trail for unusual activity</li>
+                                            <li>Contact RealPM for hosted service security</li>
+                                            <li>Report vulnerabilities responsibly</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
