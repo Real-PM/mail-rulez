@@ -360,9 +360,14 @@ class EmailProcessor:
                 'processed',    # For processed emails in startup mode  
                 'junk',         # For spam/rejected emails
                 'approved_ads', # For approved vendor emails
-                'approved',     # Training folder for whitelisted emails
-                'rejected',     # Training folder for blacklisted emails
+                'headhunt',     # For head hunt emails
+                'packages',     # For package delivery emails
+                'receipts',     # For receipt emails
+                'linkedin',     # For LinkedIn emails
+                'whitelist',    # Training folder for whitelisted emails
+                'blacklist',    # Training folder for blacklisted emails
                 'vendor',       # Training folder for vendor emails
+                'headhunter',   # Training folder for headhunter emails
             ]
             
             for folder_key in essential_folders:
