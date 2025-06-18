@@ -224,14 +224,14 @@
                         <div class="form-text">🎯 <strong>Optional:</strong> Job opportunities and recruitment emails</div>
                     </div>
                     <div class="mb-3">
-                        {{ form.folder_approved.label(class="form-label") }}
-                        {{ form.folder_approved(class="form-control") }}
-                        <div class="form-text">📂 <strong>Manual Training Folder:</strong> Drag emails here to automatically add senders to your approved list (white.txt). These emails will then be moved to Processed folder.</div>
+                        {{ form.folder_whitelist.label(class="form-label") }}
+                        {{ form.folder_whitelist(class="form-control") }}
+                        <div class="form-text">📂 <strong>Manual Training Folder:</strong> Drag emails here to automatically add senders to your whitelist (white.txt). These emails will then be moved to Processed folder.</div>
                     </div>
                     <div class="mb-3">
-                        {{ form.folder_rejected.label(class="form-label") }}
-                        {{ form.folder_rejected(class="form-control") }}
-                        <div class="form-text">📂 <strong>Manual Training Folder:</strong> Drag emails here to automatically add senders to your blocked list (black.txt). These emails will then be moved to Junk folder.</div>
+                        {{ form.folder_blacklist.label(class="form-label") }}
+                        {{ form.folder_blacklist(class="form-control") }}
+                        <div class="form-text">📂 <strong>Manual Training Folder:</strong> Drag emails here to automatically add senders to your blacklist (black.txt). These emails will then be moved to Junk folder.</div>
                     </div>
                     <div class="mb-3">
                         {{ form.folder_vendor.label(class="form-label") }}
@@ -239,9 +239,9 @@
                         <div class="form-text">📂 <strong>Manual Training Folder:</strong> Drag vendor emails here to automatically add senders to your vendor list (vendor.txt). These emails will then be moved to Approved Ads folder.</div>
                     </div>
                     <div class="mb-3">
-                        {{ form.folder_head.label(class="form-label") }}
-                        {{ form.folder_head(class="form-control") }}
-                        <div class="form-text">📂 <strong>Manual Training Folder:</strong> Drag recruitment emails here to automatically add senders to your head hunter list (head.txt). These emails will then be moved to HeadHunt folder.</div>
+                        {{ form.folder_headhunter.label(class="form-label") }}
+                        {{ form.folder_headhunter(class="form-control") }}
+                        <div class="form-text">📂 <strong>Manual Training Folder:</strong> Drag recruitment emails here to automatically add senders to your headhunter list. These emails will then be moved to HeadHunt folder.</div>
                     </div>
                 </div>
             </div>
