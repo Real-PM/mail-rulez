@@ -54,11 +54,22 @@ def overview():
 @login_required
 def api_stats():
     """API endpoint for real-time dashboard data"""
+    # Get recent activity and convert datetime objects to strings for JSON
+    recent_activity = get_recent_activity()
+    activity_json = []
+    for activity in recent_activity[:5]:  # Limit to 5 most recent
+        activity_json.append({
+            'message': activity['message'],
+            'timestamp_str': activity['timestamp_str'],
+            'status': activity['status']
+        })
+    
     return jsonify({
         'system': get_system_stats(),
         'processing': get_processing_stats(),
         'lists': get_list_stats(),
-        'accounts': get_account_stats()
+        'accounts': get_account_stats(),
+        'recent_activity': activity_json
     })
 
 
@@ -95,27 +106,49 @@ def get_system_stats():
 
 def get_processing_stats():
     """Get email processing statistics"""
+    fallback_stats = {
+        'total_processed_today': 0,
+        'whitelisted_today': 0,
+        'blacklisted_today': 0,
+        'pending_count': 0,
+        'last_run': 'Never',
+        'processing_errors': 0,
+        'avg_processing_time': 'N/A'
+    }
+    
     try:
         # Import here to avoid circular imports
         from services.task_manager import get_task_manager
         
         task_manager = get_task_manager()
+        if not task_manager:
+            current_app.logger.warning("Task manager not available")
+            return fallback_stats
+            
         aggregate_stats = task_manager.get_aggregate_stats()
+        if not aggregate_stats:
+            current_app.logger.warning("Aggregate stats not available")
+            return fallback_stats
         
         # Get most recent last_run timestamp from all accounts
         from datetime import datetime
         most_recent_run = None
-        all_status = task_manager.get_all_status()
         
-        for account_email, account_status in all_status.get('accounts', {}).items():
-            last_run_str = account_status.get('stats', {}).get('last_run')
-            if last_run_str:
-                try:
-                    last_run = datetime.fromisoformat(last_run_str)
-                    if most_recent_run is None or last_run > most_recent_run:
-                        most_recent_run = last_run
-                except (ValueError, TypeError):
-                    continue
+        try:
+            all_status = task_manager.get_all_status()
+            if all_status and 'accounts' in all_status:
+                for account_email, account_status in all_status['accounts'].items():
+                    if account_status and 'stats' in account_status:
+                        last_run_str = account_status['stats'].get('last_run')
+                        if last_run_str:
+                            try:
+                                last_run = datetime.fromisoformat(last_run_str)
+                                if most_recent_run is None or last_run > most_recent_run:
+                                    most_recent_run = last_run
+                            except (ValueError, TypeError):
+                                continue
+        except Exception as e:
+            current_app.logger.warning(f"Error getting last run times: {e}")
         
         # Format last_run for display
         if most_recent_run:
@@ -125,7 +158,7 @@ def get_processing_stats():
         else:
             last_run_display = 'Never'
         
-        # Convert to dashboard format
+        # Convert to dashboard format with safe defaults
         stats = {
             'total_processed_today': aggregate_stats.get('total_emails_processed', 0),
             'whitelisted_today': 0,  # TODO: Implement daily breakdown
@@ -136,20 +169,12 @@ def get_processing_stats():
             'avg_processing_time': f"{aggregate_stats.get('avg_processing_time', 0):.1f}s" if aggregate_stats.get('avg_processing_time', 0) > 0 else 'N/A'
         }
         
+        current_app.logger.debug(f"Processing stats retrieved successfully: {stats}")
         return stats
         
     except Exception as e:
-        current_app.logger.error(f"Error getting processing stats: {e}")
-        # Fallback stats in case of error
-        return {
-            'total_processed_today': 0,
-            'whitelisted_today': 0,
-            'blacklisted_today': 0,
-            'pending_count': 0,
-            'last_run': 'Never',
-            'processing_errors': 0,
-            'avg_processing_time': 'N/A'
-        }
+        current_app.logger.error(f"Error getting processing stats: {e}", exc_info=True)
+        return fallback_stats
 
 
 def get_list_stats():
@@ -177,41 +202,57 @@ def get_list_stats():
 
 def get_account_stats():
     """Get email account statistics"""
+    fallback_stats = {
+        'total_accounts': 0,
+        'active_accounts': 0,
+        'inactive_accounts': 0,
+        'error_accounts': 0,
+        'account_names': []
+    }
+    
     try:
         # Import here to avoid circular imports
         from services.task_manager import get_task_manager
         
         task_manager = get_task_manager()
+        if not task_manager:
+            current_app.logger.warning("Task manager not available for account stats")
+            return fallback_stats
+            
         aggregate_stats = task_manager.get_aggregate_stats()
         system_status = task_manager.get_all_status()
         
+        if not aggregate_stats:
+            current_app.logger.warning("Aggregate stats not available for account stats")
+            return fallback_stats
+            
         total_accounts = aggregate_stats.get('total_accounts', 0)
         running_accounts = aggregate_stats.get('running_accounts', 0)
         
         # Count error accounts
         error_accounts = 0
         account_names = []
-        for account_email, account_status in system_status.get('accounts', {}).items():
-            account_names.append(account_email)
-            if account_status.get('state') == 'error':
-                error_accounts += 1
         
-        return {
+        if system_status and 'accounts' in system_status:
+            for account_email, account_status in system_status['accounts'].items():
+                account_names.append(account_email)
+                if account_status and account_status.get('state') == 'error':
+                    error_accounts += 1
+        
+        stats = {
             'total_accounts': total_accounts,
             'active_accounts': running_accounts,
-            'inactive_accounts': total_accounts - running_accounts - error_accounts,
+            'inactive_accounts': max(0, total_accounts - running_accounts - error_accounts),
             'error_accounts': error_accounts,
             'account_names': account_names
         }
+        
+        current_app.logger.debug(f"Account stats retrieved successfully: {stats}")
+        return stats
+        
     except Exception as e:
-        current_app.logger.error(f"Error getting account stats: {e}")
-        return {
-            'total_accounts': 0,
-            'active_accounts': 0,
-            'inactive_accounts': 0,
-            'error_accounts': 0,
-            'account_names': []
-        }
+        current_app.logger.error(f"Error getting account stats: {e}", exc_info=True)
+        return fallback_stats
 
 
 def get_recent_activity():
@@ -221,22 +262,36 @@ def get_recent_activity():
         from services.task_manager import get_task_manager
         
         task_manager = get_task_manager()
+        if not task_manager:
+            current_app.logger.warning("Task manager not available for recent activity")
+            return []
+            
         task_history = task_manager.get_task_history(limit=10)
+        if not task_history:
+            current_app.logger.debug("No task history available")
+            return []
         
         activities = []
         for task in task_history:
-            # Convert task history to activity format
-            activity = {
-                'message': get_activity_message(task),
-                'timestamp': datetime.fromisoformat(task['timestamp']),
-                'status': get_activity_status(task['type'])
-            }
-            activities.append(activity)
+            try:
+                # Convert task history to activity format
+                timestamp = datetime.fromisoformat(task['timestamp'])
+                activity = {
+                    'message': get_activity_message(task),
+                    'timestamp': timestamp,
+                    'timestamp_str': timestamp.strftime('%H:%M:%S'),
+                    'status': get_activity_status(task['type'])
+                }
+                activities.append(activity)
+            except (KeyError, ValueError, TypeError) as e:
+                current_app.logger.warning(f"Error processing task history item: {e}")
+                continue
         
+        current_app.logger.debug(f"Retrieved {len(activities)} recent activities")
         return activities
         
     except Exception as e:
-        current_app.logger.error(f"Error getting recent activity: {e}")
+        current_app.logger.error(f"Error getting recent activity: {e}", exc_info=True)
         return []
 
 

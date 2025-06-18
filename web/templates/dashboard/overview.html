@@ -131,7 +131,7 @@
                 <div class="card-header">
                     <i class="bi bi-activity"></i> Recent Activity
                 </div>
-                <div class="card-body">
+                <div class="card-body" id="recent-activity-body">
                     {% if recent_activity %}
                         {% for activity in recent_activity[:5] %}
                         <div class="d-flex align-items-center mb-2">
@@ -197,11 +197,159 @@
 {% block extra_scripts %}
 <script>
 function refreshStats() {
-    // TODO: Implement real-time stats refresh via AJAX
-    location.reload();
+    console.log('Refreshing dashboard stats...');
+    
+    // Show loading indicator
+    const refreshBtn = document.querySelector('button[onclick="refreshStats()"]');
+    const originalContent = refreshBtn.innerHTML;
+    refreshBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Loading...';
+    refreshBtn.disabled = true;
+    
+    // Fetch updated stats via AJAX
+    fetch('{{ url_for("dashboard.api_stats") }}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Stats refreshed successfully:', data);
+            updateDashboardData(data);
+        })
+        .catch(error => {
+            console.error('Error refreshing stats:', error);
+            // Fallback to full page reload on AJAX error
+            console.log('Falling back to page reload...');
+            location.reload();
+        })
+        .finally(() => {
+            // Restore refresh button
+            refreshBtn.innerHTML = originalContent;
+            refreshBtn.disabled = false;
+        });
+}
+
+function updateDashboardData(data) {
+    try {
+        // Update system stats (CPU, Memory, etc.)
+        if (data.system) {
+            const cpu = data.system.cpu_percent || 0;
+            const memory = data.system.memory_percent || 0;
+            document.querySelector('.card.bg-primary .text-lg.fw-bold').textContent = cpu.toFixed(1) + '%';
+            document.querySelector('.card.bg-warning .text-lg.fw-bold').textContent = memory.toFixed(1) + '%';
+        }
+        
+        // Update processing stats (Emails Today card)
+        if (data.processing) {
+            const emailsToday = data.processing.total_processed_today || 0;
+            document.querySelector('.card.bg-success .text-lg.fw-bold').textContent = emailsToday;
+            
+            // Update processing statistics section
+            const whitelisted = data.processing.whitelisted_today || 0;
+            const blacklisted = data.processing.blacklisted_today || 0;
+            const pending = data.processing.pending_count || 0;
+            const lastRun = data.processing.last_run || 'Never';
+            const avgTime = data.processing.avg_processing_time || 'N/A';
+            const errors = data.processing.processing_errors || 0;
+            
+            // Update processing details in the Email Processing Statistics card
+            const processingCard = document.querySelector('[data-card="processing-stats"]') || 
+                                 document.querySelector('.card-header:contains("Email Processing Statistics")').closest('.card');
+            
+            if (processingCard) {
+                const lists = processingCard.querySelectorAll('li');
+                if (lists.length >= 6) {
+                    lists[0].innerHTML = `<i class="bi bi-check-circle text-success"></i> Whitelisted: ${whitelisted}`;
+                    lists[1].innerHTML = `<i class="bi bi-x-circle text-danger"></i> Blacklisted: ${blacklisted}`;
+                    lists[2].innerHTML = `<i class="bi bi-clock text-warning"></i> Pending: ${pending}`;
+                    lists[3].innerHTML = `<i class="bi bi-clock-history"></i> Last Run: ${lastRun}`;
+                    lists[4].innerHTML = `<i class="bi bi-speedometer"></i> Avg Time: ${avgTime}`;
+                    lists[5].innerHTML = `<i class="bi bi-exclamation-triangle"></i> Errors: ${errors}`;
+                }
+            }
+        }
+        
+        // Update account stats (Active Accounts card)
+        if (data.accounts) {
+            const activeAccounts = data.accounts.active_accounts || 0;
+            document.querySelector('.card.bg-info .text-lg.fw-bold').textContent = activeAccounts;
+        }
+        
+        // Update recent activity
+        if (data.recent_activity) {
+            updateRecentActivity(data.recent_activity);
+        }
+        
+        console.log('Dashboard data updated successfully');
+        
+    } catch (error) {
+        console.error('Error updating dashboard data:', error);
+        // Fallback to full page reload if update fails
+        location.reload();
+    }
+}
+
+function updateRecentActivity(activities) {
+    try {
+        // Find the Recent Activity card body by ID
+        const cardBody = document.getElementById('recent-activity-body');
+        if (!cardBody) return;
+        
+        if (!activities || activities.length === 0) {
+            cardBody.innerHTML = '<p class="text-muted">No recent activity</p>';
+            return;
+        }
+        
+        // Build new activity HTML
+        let activityHTML = '';
+        activities.forEach(activity => {
+            const iconClass = getStatusIcon(activity.status);
+            activityHTML += `
+                <div class="d-flex align-items-center mb-2">
+                    <div class="me-2">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="small">${activity.message}</div>
+                        <div class="text-muted small">${activity.timestamp_str}</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        cardBody.innerHTML = activityHTML;
+        
+    } catch (error) {
+        console.error('Error updating recent activity:', error);
+    }
+}
+
+function getStatusIcon(status) {
+    switch (status) {
+        case 'success':
+            return 'bi bi-check-circle text-success';
+        case 'error':
+            return 'bi bi-x-circle text-danger';
+        default:
+            return 'bi bi-info-circle text-info';
+    }
 }
 
 // Auto-refresh every 30 seconds
 setInterval(refreshStats, 30000);
+
+// Add CSS for spinning animation
+const style = document.createElement('style');
+style.textContent = `
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(style);
 </script>
 {% endblock %}
