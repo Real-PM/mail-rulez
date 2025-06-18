@@ -40,10 +40,14 @@ def overview():
     # Get recent activity
     recent_activity = get_recent_activity()
     
+    # Get account stats
+    account_stats = get_account_stats()
+    
     return render_template('dashboard/overview.html',
                          stats=stats,
                          processing_stats=processing_stats,
-                         recent_activity=recent_activity)
+                         recent_activity=recent_activity,
+                         account_count=account_stats.get('active_accounts', 0))
 
 
 @dashboard_bp.route('/api/stats')
