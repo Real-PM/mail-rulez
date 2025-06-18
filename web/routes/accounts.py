@@ -675,9 +675,13 @@ def save_all_accounts():
 def create_folders(account_name):
     """Display folder creation page and handle folder creation"""
     try:
+        # Force reload config to get latest saved accounts
+        from config import Config
+        fresh_config = Config(current_app.mail_config.base_dir, current_app.mail_config.config_file, current_app.mail_config.use_encryption)
+        
         # Find the account
         account = None
-        for acc in current_app.mail_config.accounts:
+        for acc in fresh_config.accounts:
             if acc.name == account_name:
                 account = acc
                 break
