@@ -195,8 +195,16 @@ def list_rules():
 @login_required
 def add_rule():
     """Add a new rule"""
-    # Get available accounts for the dropdown
-    accounts = current_app.mail_config.accounts
+    # Get available accounts for the dropdown using fresh config
+    try:
+        from config import Config
+        fresh_config = Config(current_app.mail_config.base_dir, current_app.mail_config.config_file, current_app.mail_config.use_encryption)
+        accounts = fresh_config.accounts
+        current_app.logger.info(f"Loaded {len(accounts)} accounts for rule creation")
+    except Exception as e:
+        current_app.logger.error(f"Error loading accounts for rule creation: {e}")
+        accounts = []
+    
     account_choices = [('', 'Select an Account')] + [(acc.email, f"{acc.name} ({acc.email})") for acc in accounts]
     
     return render_template('rules/add.html', templates=RULE_TEMPLATES, account_choices=account_choices)
@@ -298,8 +306,16 @@ def edit_rule(rule_id):
         flash('Rule not found', 'error')
         return redirect(url_for('rules.list_rules'))
     
-    # Get available accounts for the dropdown
-    accounts = current_app.mail_config.accounts
+    # Get available accounts for the dropdown using fresh config
+    try:
+        from config import Config
+        fresh_config = Config(current_app.mail_config.base_dir, current_app.mail_config.config_file, current_app.mail_config.use_encryption)
+        accounts = fresh_config.accounts
+        current_app.logger.info(f"Loaded {len(accounts)} accounts for rule editing")
+    except Exception as e:
+        current_app.logger.error(f"Error loading accounts for rule editing: {e}")
+        accounts = []
+    
     account_choices = [('', 'Apply to All Accounts')] + [(acc.email, f"{acc.name} ({acc.email})") for acc in accounts]
     
     return render_template('rules/edit.html', rule=rule, account_choices=account_choices)

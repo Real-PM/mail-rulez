@@ -199,16 +199,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update service status for an account
     async function updateServiceStatus(accountEmail, index) {
+        const serviceStatusBadge = document.getElementById(`service-status-${index}`);
+        const startBtn = document.getElementById(`start-btn-${index}`);
+        const stopBtn = document.getElementById(`stop-btn-${index}`);
+        const restartBtn = document.getElementById(`restart-btn-${index}`);
+        
         try {
             const response = await fetch(`/api/services/accounts/${accountEmail}/status`);
             const result = await response.json();
             
             if (result.success) {
                 const status = result.data;
-                const serviceStatusBadge = document.getElementById(`service-status-${index}`);
-                const startBtn = document.getElementById(`start-btn-${index}`);
-                const stopBtn = document.getElementById(`stop-btn-${index}`);
-                const restartBtn = document.getElementById(`restart-btn-${index}`);
                 
                 // Update status badge
                 serviceStatusBadge.textContent = status.state;
@@ -236,10 +237,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     stopBtn.style.display = 'none';
                     restartBtn.style.display = 'none';
                 }
+            } else {
+                console.error(`API error for ${accountEmail}:`, result.error);
+                // On API error, show default state (stopped with start button)
+                setDefaultServiceState(index);
             }
         } catch (error) {
-            console.error('Failed to update service status:', error);
+            console.error(`Failed to update service status for ${accountEmail}:`, error);
+            // On network error, show default state (stopped with start button)
+            setDefaultServiceState(index);
         }
+    }
+    
+    // Function to set default service state when API fails
+    function setDefaultServiceState(index) {
+        const serviceStatusBadge = document.getElementById(`service-status-${index}`);
+        const startBtn = document.getElementById(`start-btn-${index}`);
+        const stopBtn = document.getElementById(`stop-btn-${index}`);
+        const restartBtn = document.getElementById(`restart-btn-${index}`);
+        
+        // Default to stopped state with start button visible
+        serviceStatusBadge.textContent = 'Stopped';
+        serviceStatusBadge.className = 'badge bg-secondary';
+        startBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
+        restartBtn.style.display = 'none';
     }
     
     // Function to get appropriate CSS class for status
@@ -287,14 +309,39 @@ document.addEventListener('DOMContentLoaded', function() {
         // Find service buttons specifically (they have the account email and proper index)
         const serviceButtons = document.querySelectorAll('.service-btn[data-action="start"]');
         
-        for (const button of serviceButtons) {
+        // First, set all accounts to default state immediately to show buttons
+        serviceButtons.forEach(button => {
+            const index = button.dataset.index;
+            if (index !== undefined) {
+                setDefaultServiceState(parseInt(index));
+            }
+        });
+        
+        // Then try to get actual status with timeout protection
+        const statusPromises = Array.from(serviceButtons).map(async (button) => {
             const accountEmail = button.dataset.account;
             const index = button.dataset.index;
             
             if (accountEmail && accountEmail.includes('@') && index !== undefined) {
-                await updateServiceStatus(accountEmail, parseInt(index));
+                try {
+                    // Add a timeout wrapper to prevent hanging
+                    await Promise.race([
+                        updateServiceStatus(accountEmail, parseInt(index)),
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Status check timeout')), 10000)
+                        )
+                    ]);
+                } catch (error) {
+                    console.error(`Status check failed for ${accountEmail}:`, error);
+                    // Default state already set above, so continue
+                }
             }
-        }
+        });
+        
+        // Don't wait for all promises to complete - let them run in background
+        Promise.allSettled(statusPromises).then(() => {
+            console.log('Service status checks completed');
+        });
     }
     
     // Auto-test all accounts on page load
