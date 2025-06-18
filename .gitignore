@@ -4,7 +4,12 @@ FEATURE_PLANS.md
 DOCKER.MD
 reflection.md
 DEPLOYMENT-NOTES.md
+README.MD.draft
 
+# Project planning and defect tracking files
+DEFECTS.MD
+DEFECTS.MD.backup
+FEATURE_PLANNING.MD
 # Testing directories
 data/
 lists/
