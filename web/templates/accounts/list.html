@@ -214,16 +214,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 serviceStatusBadge.textContent = status.state;
                 serviceStatusBadge.className = `badge ${getStatusBadgeClass(status.state)}`;
                 
-                // Show/hide appropriate buttons
-                if (status.state === 'stopped') {
+                // Show/hide appropriate buttons based on current state
+                if (status.state === 'stopped' || status.state === 'error') {
+                    // Account is stopped or in error state - show start button
                     startBtn.style.display = 'inline-block';
                     stopBtn.style.display = 'none';
                     restartBtn.style.display = 'none';
                 } else if (status.state === 'running_startup' || status.state === 'running_maintenance') {
+                    // Account is actively running - show stop and restart buttons
                     startBtn.style.display = 'none';
                     stopBtn.style.display = 'inline-block';
                     restartBtn.style.display = 'inline-block';
+                } else if (status.state === 'starting' || status.state === 'stopping') {
+                    // Account is transitioning - show no action buttons to prevent conflicts
+                    startBtn.style.display = 'none';
+                    stopBtn.style.display = 'none';
+                    restartBtn.style.display = 'none';
                 } else {
+                    // Unknown state - default to showing start button
                     startBtn.style.display = 'inline-block';
                     stopBtn.style.display = 'none';
                     restartBtn.style.display = 'none';
