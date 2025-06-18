@@ -24,10 +24,10 @@ class AccountConfig:
                 'junk': 'INBOX.Junk',
                 'approved_ads': 'INBOX.Approved_Ads',
                 'headhunt': 'INBOX.HeadHunt',
-                'approved': 'INBOX._Approved',
-                'rejected': 'INBOX._Rejected',
-                'vendor': 'INBOX._Vendor',
-                'head': 'INBOX._HH'
+                'whitelist': 'INBOX._whitelist',
+                'blacklist': 'INBOX._blacklist',
+                'vendor': 'INBOX._vendor',
+                'headhunter': 'INBOX._headhunter'
             }
 
 

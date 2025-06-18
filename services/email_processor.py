@@ -456,22 +456,22 @@ class EmailProcessor:
         """Setup jobs for processing training folders"""
         # Get configured folder names
         if hasattr(self.account_config, 'folders') and self.account_config.folders:
-            approved_folder = self.account_config.folders.get('approved', 'INBOX._Approved')
-            rejected_folder = self.account_config.folders.get('rejected', 'INBOX._Rejected')
-            vendor_folder = self.account_config.folders.get('vendor', 'INBOX._Vendor')
+            whitelist_folder = self.account_config.folders.get('whitelist', 'INBOX._whitelist')
+            blacklist_folder = self.account_config.folders.get('blacklist', 'INBOX._blacklist')
+            vendor_folder = self.account_config.folders.get('vendor', 'INBOX._vendor')
             junk_folder = self.account_config.folders.get('junk', 'INBOX.Junk')
             approved_ads_folder = self.account_config.folders.get('approved_ads', 'INBOX.Approved_Ads')
         else:
             # Fallback to hardcoded names
-            approved_folder = 'INBOX._Approved'
-            rejected_folder = 'INBOX._Rejected'
-            vendor_folder = 'INBOX._Vendor'
+            whitelist_folder = 'INBOX._whitelist'
+            blacklist_folder = 'INBOX._blacklist'
+            vendor_folder = 'INBOX._vendor'
             junk_folder = 'INBOX.Junk'
             approved_ads_folder = 'INBOX.Approved_Ads'
         
         folders = [
-            ('white', approved_folder, 'INBOX'),
-            ('black', rejected_folder, junk_folder), 
+            ('white', whitelist_folder, 'INBOX'),
+            ('black', blacklist_folder, junk_folder), 
             ('vendor', vendor_folder, approved_ads_folder)
         ]
         

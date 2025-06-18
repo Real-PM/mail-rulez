@@ -43,10 +43,10 @@ class FolderConfigForm(FlaskForm):
         ('junk', 'Junk'),
         ('approved_ads', 'Approved Ads'),
         ('headhunt', 'Head Hunt'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-        ('vendor', 'Vendor'),
-        ('head', 'Head')
+        ('whitelist', 'Whitelist Training'),
+        ('blacklist', 'Blacklist Training'),
+        ('vendor', 'Vendor Training'),
+        ('headhunter', 'Headhunter Training')
     ])
     folder_name = StringField('IMAP Folder Name', validators=[DataRequired()])
 
@@ -90,10 +90,10 @@ class AccountForm(FlaskForm):
     folder_linkedin = StringField('LinkedIn Folder')
     
     # Training folders
-    folder_approved = StringField('Approved Training Folder')
-    folder_rejected = StringField('Rejected Training Folder')
+    folder_whitelist = StringField('Whitelist Training Folder')
+    folder_blacklist = StringField('Blacklist Training Folder')
     folder_vendor = StringField('Vendor Training Folder')
-    folder_head = StringField('Head Training Folder')
+    folder_headhunter = StringField('Headhunter Training Folder')
     
     submit = SubmitField('Save Account')
 
@@ -126,10 +126,10 @@ def add_account():
                 'junk': form.folder_junk.data,
                 'approved_ads': form.folder_approved_ads.data,
                 'headhunt': form.folder_headhunt.data,
-                'approved': form.folder_approved.data,
-                'rejected': form.folder_rejected.data,
+                'whitelist': form.folder_whitelist.data,
+                'blacklist': form.folder_blacklist.data,
                 'vendor': form.folder_vendor.data,
-                'head': form.folder_head.data
+                'headhunter': form.folder_headhunter.data
             }
             
             # Create account configuration
@@ -190,10 +190,10 @@ def edit_account(account_name):
         form.folder_junk.data = account.folders.get('junk', 'INBOX.Junk')
         form.folder_approved_ads.data = account.folders.get('approved_ads', 'INBOX.Approved_Ads')
         form.folder_headhunt.data = account.folders.get('headhunt', '')
-        form.folder_approved.data = account.folders.get('approved', 'INBOX._Approved')
-        form.folder_rejected.data = account.folders.get('rejected', 'INBOX._Rejected')
-        form.folder_vendor.data = account.folders.get('vendor', 'INBOX._Vendor')
-        form.folder_head.data = account.folders.get('head', 'INBOX._HH')
+        form.folder_whitelist.data = account.folders.get('whitelist', 'INBOX._whitelist')
+        form.folder_blacklist.data = account.folders.get('blacklist', 'INBOX._blacklist')
+        form.folder_vendor.data = account.folders.get('vendor', 'INBOX._vendor')
+        form.folder_headhunter.data = account.folders.get('headhunter', 'INBOX._headhunter')
     
     # Pre-populate additional fields if they exist
     if hasattr(account, 'port'):
@@ -219,10 +219,10 @@ def edit_account(account_name):
                 'junk': form.folder_junk.data,
                 'approved_ads': form.folder_approved_ads.data,
                 'headhunt': form.folder_headhunt.data,
-                'approved': form.folder_approved.data,
-                'rejected': form.folder_rejected.data,
+                'whitelist': form.folder_whitelist.data,
+                'blacklist': form.folder_blacklist.data,
                 'vendor': form.folder_vendor.data,
-                'head': form.folder_head.data
+                'headhunter': form.folder_headhunter.data
             }
             
             # Update additional fields
@@ -577,10 +577,10 @@ def generate_folder_suggestions(connection_result):
             'folder_packages': f'INBOX{delimiter}Packages',
             'folder_receipts': f'INBOX{delimiter}Receipts',
             'folder_linkedin': f'INBOX{delimiter}LinkedIn',
-            'folder_approved': f'INBOX{delimiter}_Approved',
-            'folder_rejected': f'INBOX{delimiter}_Rejected',
-            'folder_vendor': f'INBOX{delimiter}_Vendor',
-            'folder_head': f'INBOX{delimiter}_HH'
+            'folder_whitelist': f'INBOX{delimiter}_whitelist',
+            'folder_blacklist': f'INBOX{delimiter}_blacklist',
+            'folder_vendor': f'INBOX{delimiter}_vendor',
+            'folder_headhunter': f'INBOX{delimiter}_headhunter'
         }
     else:
         # Use flat structure or best guess
@@ -594,10 +594,10 @@ def generate_folder_suggestions(connection_result):
             'folder_packages': 'Packages',
             'folder_receipts': 'Receipts',
             'folder_linkedin': 'LinkedIn',
-            'folder_approved': '_Approved',
-            'folder_rejected': '_Rejected',
-            'folder_vendor': '_Vendor',
-            'folder_head': '_HH'
+            'folder_whitelist': '_whitelist',
+            'folder_blacklist': '_blacklist',
+            'folder_vendor': '_vendor',
+            'folder_headhunter': '_headhunter'
         }
     
     # Check for existing folders and adjust suggestions
@@ -784,8 +784,8 @@ def get_account_folders(account_email):
                     account.folders.get('pending'), 
                     account.folders.get('junk'),
                     account.folders.get('approved_ads'),
-                    account.folders.get('approved'),
-                    account.folders.get('rejected'),
+                    account.folders.get('whitelist'),
+                    account.folders.get('blacklist'),
                     account.folders.get('vendor')
                 ]
                 
