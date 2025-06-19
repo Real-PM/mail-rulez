@@ -360,51 +360,20 @@ RULE_TEMPLATES = {
     },
     
     "head_hunter": {
-        "name": "Head Hunter Recruiters", 
-        "description": "Filter recruitment and job opportunity emails from headhunters. Works with INBOX._HH training folder for manual categorization.",
-        "conditions": [
-            {
-                "type": ConditionType.SUBJECT_CONTAINS,
-                "value": "opportunity",
-                "case_sensitive": False
-            },
-            {
-                "type": ConditionType.SUBJECT_CONTAINS,
-                "value": "position",
-                "case_sensitive": False
-            },
-            {
-                "type": ConditionType.SUBJECT_CONTAINS,
-                "value": "recruiter",
-                "case_sensitive": False
-            },
-            {
-                "type": ConditionType.SUBJECT_CONTAINS,
-                "value": "job opening",
-                "case_sensitive": False
-            },
-            {
-                "type": ConditionType.CONTENT_CONTAINS,
-                "value": "recruiting",
-                "case_sensitive": False
-            },
-            {
-                "type": ConditionType.CONTENT_CONTAINS,
-                "value": "headhunter",
-                "case_sensitive": False
-            }
-        ],
+        "name": "Head Hunter Recruiters - Training Only", 
+        "description": "Training folder rule for headhunter emails. Adds sender to head list and moves to HeadHunt folder. Use training folder INBOX._headhunter for manual categorization.",
+        "conditions": [],
         "actions": [
-            {
-                "type": ActionType.MOVE_TO_FOLDER,
-                "target": "INBOX.HeadHunt"
-            },
             {
                 "type": ActionType.ADD_TO_LIST,
                 "target": "head.txt"
+            },
+            {
+                "type": ActionType.MOVE_TO_FOLDER,
+                "target": "INBOX.HeadHunt"
             }
         ],
-        "condition_logic": "OR",
+        "condition_logic": "AND",
         "priority": 80
     }
 }
