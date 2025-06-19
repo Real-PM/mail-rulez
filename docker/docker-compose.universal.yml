@@ -23,6 +23,7 @@ services:
       
       # Container configuration
       - CONTAINER_ENV=true
+      - TZ=${TZ:-UTC}
       
       # Directory paths (configurable)
       - MAIL_RULEZ_APP_DIR=/app

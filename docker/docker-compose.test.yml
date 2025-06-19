@@ -18,6 +18,7 @@ services:
       - FLASK_ENV=testing
       - FLASK_PORT=5001
       - FLASK_SECRET_KEY=test-secret-key-not-for-production
+      - TZ=${TZ:-UTC}
       
       # Test-specific paths
       - MAIL_RULEZ_APP_DIR=/app
