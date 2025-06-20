@@ -585,6 +585,123 @@ def refresh_accounts():
         }), 500
 
 
+@services_bp.route('/accounts/<account_email>/process-batch', methods=['POST'])
+def process_batch(account_email: str):
+    """
+    Process next batch of emails for an account in startup mode
+    
+    Args:
+        account_email: Email address of the account
+        
+    JSON Body:
+        limit: Number of emails to process (default 100)
+        
+    Returns:
+        JSON: Detailed batch processing results
+    """
+    try:
+        # Parse request data
+        data = request.get_json() or {}
+        limit = data.get('limit', 100)
+        
+        # Validate limit
+        if not isinstance(limit, int) or limit < 1 or limit > 500:
+            return jsonify({
+                'success': False,
+                'error': 'Limit must be an integer between 1 and 500'
+            }), 400
+        
+        # Get the processor for this account
+        task_manager = get_task_manager()
+        processor = task_manager._get_processor(account_email)
+        
+        if not processor:
+            return jsonify({
+                'success': False,
+                'error': f'Account {account_email} not found'
+            }), 404
+        
+        # Check if account is in startup mode
+        account_status = task_manager.get_account_status(account_email)
+        if not account_status:
+            return jsonify({
+                'success': False,
+                'error': f'Cannot get status for account {account_email}'
+            }), 404
+            
+        current_mode = account_status.get('mode')
+        if current_mode != 'startup':
+            return jsonify({
+                'success': False,
+                'error': f'Batch processing only available in startup mode. Account is in {current_mode} mode.'
+            }), 400
+        
+        # Import the batch processing function
+        from process_inbox import process_inbox_batch
+        
+        # Run batch processing
+        batch_result = process_inbox_batch(processor.account, limit=limit)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Processed {batch_result["emails_processed"]} emails for {account_email}',
+            'data': batch_result
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to process batch for account {account_email}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@services_bp.route('/accounts/<account_email>/inbox-count', methods=['GET'])
+def get_inbox_count(account_email: str):
+    """
+    Get current inbox count for an account
+    
+    Args:
+        account_email: Email address of the account
+        
+    Returns:
+        JSON: Current inbox count
+    """
+    try:
+        # Get the processor for this account
+        task_manager = get_task_manager()
+        processor = task_manager._get_processor(account_email)
+        
+        if not processor:
+            return jsonify({
+                'success': False,
+                'error': f'Account {account_email} not found'
+            }), 404
+        
+        # Get inbox count
+        try:
+            mb = processor.account.login()
+            inbox_count = len(mb.fetch('ALL'))
+        except Exception as e:
+            logger.warning(f"Could not get inbox count for {account_email}: {e}")
+            inbox_count = 0
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'account_email': account_email,
+                'inbox_count': inbox_count
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to get inbox count for account {account_email}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 # Error handlers
 @services_bp.errorhandler(400)
 def bad_request(error):

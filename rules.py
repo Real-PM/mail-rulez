@@ -22,6 +22,7 @@ class ConditionType(Enum):
     SUBJECT_EXACT = "subject_exact"
     SUBJECT_REGEX = "subject_regex"
     CONTENT_CONTAINS = "content_contains"
+    SENDER_IN_LIST = "sender_in_list"
 
 
 class ActionType(Enum):
@@ -84,6 +85,27 @@ class RuleCondition:
             content = email_data.get('content', '').lower() if not self.case_sensitive else email_data.get('content', '')
             value = self.value.lower() if not self.case_sensitive else self.value
             return value in content
+            
+        elif self.type == ConditionType.SENDER_IN_LIST:
+            sender = email_data.get('from', '')
+            
+            # Extract email address from sender (handle "Name <email@domain.com>" format)
+            if '<' in sender and '>' in sender:
+                sender_email = sender.split('<')[1].split('>')[0].strip()
+            else:
+                sender_email = sender.strip()
+            
+            # Load the specified list and check if sender is in it
+            try:
+                import functions as pf
+                list_entries = pf.open_read(self.value)  # self.value contains list name/path
+                # Case-insensitive email matching for reliability
+                sender_email_lower = sender_email.lower()
+                return sender_email_lower in [entry.lower() for entry in list_entries]
+            except Exception as e:
+                import logging
+                logging.warning(f"Failed to check sender against list {self.value}: {e}")
+                return False
             
         return False
 

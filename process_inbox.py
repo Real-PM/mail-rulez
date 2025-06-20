@@ -190,3 +190,63 @@ def process_inbox_maint(account, folder="INBOX", limit=500):
         pass
 
     return log
+
+
+def process_inbox_batch(account, folder="INBOX", limit=100):
+    """
+    Enhanced version of process_inbox that returns detailed batch processing results.
+    Designed for manual batch processing with UI feedback.
+    
+    Returns:
+        dict: Detailed processing results including counts and inbox status
+    """
+    # Get inbox count before processing
+    mb = account.login()
+    
+    try:
+        # Get total inbox count before processing
+        initial_inbox_count = len(mb.fetch('ALL'))
+    except Exception as e:
+        initial_inbox_count = 0
+    
+    # Process the batch using existing logic
+    log = process_inbox(account, folder, limit)
+    
+    # Get inbox count after processing
+    try:
+        mb = account.login()  # Reconnect to get fresh count
+        final_inbox_count = len(mb.fetch('ALL'))
+    except Exception as e:
+        final_inbox_count = initial_inbox_count
+    
+    # Calculate processed counts from log
+    whitelisted_count = len(log.get("uids in whitelist", []))
+    blacklisted_count = len(log.get("uids in blacklist", []))
+    vendor_count = len(log.get("uids in vendorlist", []))
+    pending_count = len(log.get("uids in pending", []))
+    
+    # Build enhanced response
+    batch_result = {
+        'success': True,
+        'batch_size': limit,
+        'emails_processed': log.get("mail_list count", 0),
+        'inbox_before': initial_inbox_count,
+        'inbox_after': final_inbox_count,
+        'inbox_remaining': final_inbox_count,
+        'categories': {
+            'whitelisted': whitelisted_count,
+            'blacklisted': blacklisted_count,
+            'vendor': vendor_count,
+            'pending': pending_count
+        },
+        'folders': {
+            'processed': whitelisted_count,
+            'junk': blacklisted_count,
+            'approved_ads': vendor_count,
+            'pending': pending_count
+        },
+        'has_more': final_inbox_count > 0,
+        'processing_log': log
+    }
+    
+    return batch_result

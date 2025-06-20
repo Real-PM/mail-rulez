@@ -168,7 +168,8 @@ const conditionTypes = [
     {value: 'subject_contains', text: 'Subject Contains'},
     {value: 'subject_exact', text: 'Subject Exact Match'},
     {value: 'subject_regex', text: 'Subject Regex'},
-    {value: 'content_contains', text: 'Content Contains'}
+    {value: 'content_contains', text: 'Content Contains'},
+    {value: 'sender_in_list', text: 'Sender Is In List'}
 ];
 
 const actionTypes = [
@@ -186,13 +187,15 @@ function addCondition() {
         <div class="row">
             <div class="col-md-3">
                 <label class="form-label">Condition Type</label>
-                <select name="conditions-${conditionIndex}-type" class="form-select" required>
+                <select name="conditions-${conditionIndex}-type" class="form-select" onchange="updateConditionValue(this, ${conditionIndex})" required>
                     ${conditionTypes.map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
                 </select>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Value</label>
-                <input type="text" name="conditions-${conditionIndex}-value" class="form-control" required>
+                <div id="condition-value-${conditionIndex}">
+                    <input type="text" name="conditions-${conditionIndex}-value" class="form-control" required>
+                </div>
             </div>
             <div class="col-md-2">
                 <label class="form-label">Case Sensitive</label>
@@ -210,6 +213,71 @@ function addCondition() {
     `;
     container.appendChild(div);
     conditionIndex++;
+}
+
+function updateConditionValue(selectElement, index) {
+    const conditionType = selectElement.value;
+    const valueContainer = document.getElementById(`condition-value-${index}`);
+    
+    if (conditionType === 'sender_in_list') {
+        // Show list selection dropdown for sender_in_list condition
+        valueContainer.innerHTML = `
+            <select name="conditions-${index}-value" class="form-select" required>
+                <option value="">Select a list...</option>
+                <option value="white">Whitelist (white)</option>
+                <option value="black">Blacklist (black)</option>
+                <option value="vendor">Vendor List (vendor)</option>
+                <option value="head">Head Hunter List (head)</option>
+            </select>
+            <small class="form-text text-muted">
+                <i class="bi bi-info-circle"></i> Choose which list to check the sender against
+            </small>
+        `;
+        loadCustomLists(index);
+    } else {
+        // Default text input for other condition types
+        let placeholder = 'Enter value';
+        if (conditionType === 'sender_contains' || conditionType === 'sender_exact') {
+            placeholder = 'e.g., john@example.com or example.com';
+        } else if (conditionType === 'sender_domain') {
+            placeholder = 'e.g., example.com';
+        } else if (conditionType === 'subject_contains' || conditionType === 'subject_exact') {
+            placeholder = 'e.g., invoice or urgent';
+        } else if (conditionType === 'subject_regex') {
+            placeholder = 'e.g., (invoice|bill).*payment';
+        } else if (conditionType === 'content_contains') {
+            placeholder = 'e.g., unsubscribe or meeting';
+        }
+        
+        valueContainer.innerHTML = `
+            <input type="text" name="conditions-${index}-value" class="form-control" 
+                   placeholder="${placeholder}" required>
+        `;
+    }
+}
+
+async function loadCustomLists(conditionIndex) {
+    try {
+        // Try to get custom lists from the lists API
+        const response = await fetch('/api/lists');
+        if (response.ok) {
+            const data = await response.json();
+            const select = document.querySelector(`select[name="conditions-${conditionIndex}-value"]`);
+            
+            // Add custom lists if any exist
+            if (data.custom_lists && data.custom_lists.length > 0) {
+                data.custom_lists.forEach(list => {
+                    const option = document.createElement('option');
+                    option.value = list.name;
+                    option.textContent = `${list.display_name} (${list.name})`;
+                    select.appendChild(option);
+                });
+            }
+        }
+    } catch (error) {
+        console.warn('Could not load custom lists:', error);
+        // This is not critical, so we just continue with built-in lists
+    }
 }
 
 function addAction() {

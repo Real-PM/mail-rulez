@@ -141,7 +141,8 @@ class ConditionForm(FlaskForm):
         (ConditionType.SUBJECT_CONTAINS.value, 'Subject Contains'),
         (ConditionType.SUBJECT_EXACT.value, 'Subject Exact Match'),
         (ConditionType.SUBJECT_REGEX.value, 'Subject Regex'),
-        (ConditionType.CONTENT_CONTAINS.value, 'Content Contains')
+        (ConditionType.CONTENT_CONTAINS.value, 'Content Contains'),
+        (ConditionType.SENDER_IN_LIST.value, 'Sender Is In List')
     ])
     value = StringField('Value', validators=[DataRequired()])
     case_sensitive = BooleanField('Case Sensitive')

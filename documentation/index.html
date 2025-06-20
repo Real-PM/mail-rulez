@@ -995,6 +995,28 @@ https://mail.yourcompany.com
                                 <p class="text-muted"><strong>Screenshot Placeholder:</strong> Dashboard statistics cards showing CPU at 15%, Memory at 42%, 247 emails processed today, 3 active accounts</p>
                             </div>
 
+                            <h4><i class="fas fa-layer-group text-primary"></i> Startup Mode Batch Processing <span class="badge bg-primary">NEW</span></h4>
+                            <p>For accounts in startup mode, the dashboard provides manual batch processing controls to help you work through large inbox backlogs at your own pace.</p>
+                            
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> Batch Processing Features</h6>
+                                <ul class="mb-0">
+                                    <li><strong>100-Email Batches:</strong> Process emails in manageable chunks for optimal performance</li>
+                                    <li><strong>Real-time Progress:</strong> See inbox count before and after each batch</li>
+                                    <li><strong>Detailed Results:</strong> View categorized results (whitelisted, blacklisted, vendor, pending)</li>
+                                    <li><strong>Safety Controls:</strong> Only available in startup mode, button disabled when inbox is empty</li>
+                                    <li><strong>Per-Account Control:</strong> Process each email account independently</li>
+                                </ul>
+                            </div>
+
+                            <p><strong>How it works:</strong> Each account in startup mode displays its current inbox count and a "Process Next 100" button. Click to process the next batch of emails, see the results, and continue at your own pace. The system automatically categorizes emails using your lists and rules, moving them to appropriate folders.</p>
+
+                            <div class="code-block">
+                                <strong>Example batch result:</strong><br>
+                                Processed 100 emails: 45 to Processed, 12 to Junk, 3 to Approved Ads, 40 to Pending<br>
+                                Inbox remaining: 1,150 emails
+                            </div>
+
                             <div class="mt-5 mb-4">
                                 <h3><i class="fas fa-user-cog text-success"></i> Accounts Management</h3>
                             </div>
@@ -2506,6 +2528,11 @@ https://mail.yourcompany.com
                                             <td>Searches within the email body text</td>
                                             <td><code>tracking number</code> finds shipping notifications</td>
                                         </tr>
+                                        <tr class="table-info">
+                                            <td><code>Sender Is In List</code> <span class="badge bg-primary">NEW</span></td>
+                                            <td>Matches if sender is in a specified list (whitelist, blacklist, vendor, head, or custom)</td>
+                                            <td><code>vendor</code> matches emails from anyone in your vendor list</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -2796,6 +2823,47 @@ https://mail.yourcompany.com
                             <div class="screenshot-placeholder mt-4">
                                 <i class="fas fa-camera fa-2x text-muted mb-2"></i>
                                 <p class="text-muted"><strong>Screenshot Placeholder:</strong> Completed meeting invitations rule showing multiple OR conditions with subject and content matching</p>
+                            </div>
+
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-users text-success"></i> Example: VIP Client Processing <span class="badge bg-primary">NEW</span></h5>
+                                </div>
+                                <div class="card-body">
+                                    <h6>Goal:</h6>
+                                    <p>Automatically prioritize emails from important clients or team members by checking against your managed lists.</p>
+                                    
+                                    <h6>Rule Setup:</h6>
+                                    <table class="table table-sm">
+                                        <tr><td><strong>Name:</strong></td><td>VIP Client Processing</td></tr>
+                                        <tr><td><strong>Description:</strong></td><td>High-priority handling for emails from VIP list members</td></tr>
+                                        <tr><td><strong>Priority:</strong></td><td>10 (high priority)</td></tr>
+                                        <tr><td><strong>Logic:</strong></td><td>AND (all conditions must match)</td></tr>
+                                    </table>
+                                    
+                                    <h6>Conditions (AND logic):</h6>
+                                    <ul>
+                                        <li><strong>Sender Is In List:</strong> <code>whitelist</code> (or custom VIP list)</li>
+                                        <li>Subject Contains: <code>urgent</code> OR <code>priority</code> OR <code>important</code></li>
+                                    </ul>
+                                    
+                                    <h6>Actions:</h6>
+                                    <ul>
+                                        <li>Move to Folder: <code>INBOX.VIP</code></li>
+                                        <li>Add to List: <code>vip-communications.txt</code></li>
+                                        <li>Forward: <code>assistant@company.com</code></li>
+                                    </ul>
+
+                                    <div class="alert alert-success mt-3">
+                                        <h6><i class="fas fa-star"></i> List-Based Rule Benefits</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>Leverages existing lists:</strong> Uses your whitelist or custom VIP list for sender verification</li>
+                                            <li><strong>Easy maintenance:</strong> Add/remove VIPs from list instead of editing rules</li>
+                                            <li><strong>Scalable:</strong> Automatically applies to new VIPs added to the list</li>
+                                            <li><strong>Flexible:</strong> Combine list checking with other conditions for precise targeting</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
 
                             <h3>Pre-Built Rule Templates</h3>
