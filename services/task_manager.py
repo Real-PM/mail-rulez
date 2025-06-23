@@ -271,16 +271,19 @@ class TaskManager:
         Returns:
             dict: Aggregated statistics
         """
-        # Return empty stats if not yet initialized to prevent race conditions
+        # Return minimal stats if not yet initialized, but still show account count
         if not self._initialized:
-            self.logger.debug("Stats requested before initialization complete, returning empty stats")
+            self.logger.debug("Stats requested before initialization complete, returning minimal stats")
             return {
-                'total_processed': 0,
-                'total_pending': 0,
+                'total_accounts': len(self.processors),  # Show actual account count even during init
+                'running_accounts': 0,  # Conservative - no running accounts during init
+                'startup_mode_accounts': 0,
+                'maintenance_mode_accounts': 0,
+                'total_emails_processed': 0,
+                'total_emails_pending': 0, 
                 'total_errors': 0,
-                'average_processing_time': 0.0,
-                'last_processed': None,
-                'accounts_count': 0
+                'avg_processing_time': 0.0,
+                'error_rate': 0.0
             }
             
         with self._lock:

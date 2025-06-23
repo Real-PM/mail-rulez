@@ -159,8 +159,13 @@ def get_processing_stats():
             last_run_display = 'Never'
         
         # Convert to dashboard format with safe defaults
+        total_processed = aggregate_stats.get('total_emails_processed', 0)
+        
+        # Debug logging for zero value troubleshooting
+        current_app.logger.debug(f"Processing stats - total_processed: {total_processed}, aggregate_stats keys: {list(aggregate_stats.keys())}")
+        
         stats = {
-            'total_processed_today': aggregate_stats.get('total_emails_processed', 0),
+            'total_processed_today': total_processed,
             'whitelisted_today': 0,  # TODO: Implement daily breakdown
             'blacklisted_today': 0,  # TODO: Implement daily breakdown
             'pending_count': aggregate_stats.get('total_emails_pending', 0),
@@ -239,10 +244,15 @@ def get_account_stats():
                 if account_status and account_status.get('state') == 'error':
                     error_accounts += 1
         
+        # Use config-based count for consistency with template
+        from flask import current_app
+        config_account_count = len(current_app.mail_config.accounts)
+        
         stats = {
             'total_accounts': total_accounts,
-            'active_accounts': running_accounts,
-            'inactive_accounts': max(0, total_accounts - running_accounts - error_accounts),
+            'active_accounts': config_account_count,  # Consistent with template account_count
+            'running_accounts': running_accounts,  # Processors currently running
+            'inactive_accounts': max(0, config_account_count - running_accounts - error_accounts),
             'error_accounts': error_accounts,
             'account_names': account_names
         }
