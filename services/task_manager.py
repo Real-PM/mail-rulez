@@ -284,6 +284,17 @@ class TaskManager:
             }
             
         with self._lock:
+            # Create atomic snapshots of all processor stats
+            processor_snapshots = {}
+            for email, processor in self.processors.items():
+                try:
+                    processor_snapshots[email] = processor.get_stats_snapshot()
+                except Exception as e:
+                    self.logger.warning(f"Failed to get stats snapshot for {email}: {e}")
+                    # Skip this processor if snapshot fails
+                    continue
+            
+            # Calculate aggregates from snapshots (immune to concurrent changes)
             total_processed = 0
             total_pending = 0
             total_errors = 0
@@ -293,19 +304,23 @@ class TaskManager:
             startup_count = 0
             maintenance_count = 0
             
-            for processor in self.processors.values():
-                stats = processor.stats
-                total_processed += stats.emails_processed
-                total_pending += stats.emails_pending
-                total_errors += stats.error_count
+            for snapshot in processor_snapshots.values():
+                total_processed += snapshot.get('emails_processed', 0)
+                total_pending += snapshot.get('emails_pending', 0)
+                total_errors += snapshot.get('error_count', 0)
                 
-                if stats.avg_processing_time > 0:
-                    avg_processing_times.append(stats.avg_processing_time)
+                avg_time = snapshot.get('avg_processing_time', 0)
+                if avg_time > 0:
+                    avg_processing_times.append(avg_time)
                 
-                if processor.state in [ServiceState.RUNNING_STARTUP, ServiceState.RUNNING_MAINTENANCE]:
+                # Count by state and mode from snapshot
+                state = snapshot.get('state', '')
+                mode = snapshot.get('mode', '')
+                
+                if state in ['RUNNING_STARTUP', 'RUNNING_MAINTENANCE']:
                     running_count += 1
                     
-                if processor.mode == ProcessingMode.STARTUP:
+                if mode == 'STARTUP':
                     startup_count += 1
                 else:
                     maintenance_count += 1

@@ -266,6 +266,29 @@ class EmailProcessor:
                 'active_jobs': len(self.scheduler.get_jobs()) if hasattr(self.scheduler, 'get_jobs') else 0
             }
     
+    def get_stats_snapshot(self) -> Dict[str, Any]:
+        """
+        Get atomic snapshot of current statistics for safe concurrent access
+        
+        Returns:
+            dict: Immutable copy of current stats
+        """
+        with self._lock:
+            # Create deep copy of stats to prevent concurrent modification
+            snapshot = {
+                'emails_processed': self.stats.emails_processed,
+                'emails_pending': self.stats.emails_pending,
+                'last_run': self.stats.last_run,
+                'total_runtime': self.stats.total_runtime,
+                'error_count': self.stats.error_count,
+                'avg_processing_time': self.stats.avg_processing_time,
+                'mode_start_time': self.stats.mode_start_time,
+                'state': self.state.value,
+                'mode': self.mode.value,
+                'account': self.account_config.email
+            }
+            return snapshot
+    
     def _test_connection(self) -> bool:
         """Test connection to email server"""
         try:
