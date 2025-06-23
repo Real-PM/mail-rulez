@@ -31,6 +31,9 @@ def login_required(f):
 @login_required
 def overview():
     """Main dashboard overview page"""
+    # DEPLOYMENT TEST LOG - Build 53 verification
+    current_app.logger.info("DEPLOYMENT_TEST: Dashboard overview route accessed - Build 53 is active")
+    
     # Get system stats
     stats = get_system_stats()
     
@@ -54,6 +57,9 @@ def overview():
 @login_required
 def api_stats():
     """API endpoint for real-time dashboard data"""
+    # DEPLOYMENT TEST LOG - Build 53 verification for API endpoint
+    current_app.logger.info("DEPLOYMENT_TEST: Dashboard API stats endpoint called - Build 53 is active")
+    
     # Get recent activity and convert datetime objects to strings for JSON
     recent_activity = get_recent_activity()
     activity_json = []

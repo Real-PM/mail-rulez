@@ -45,6 +45,11 @@ def create_app(config_dir=None, testing=False):
     # Initialize CSRF protection
     csrf = CSRFProtect(app)
     
+    # DEPLOYMENT TEST LOG - Build 53 verification
+    logger = get_logger(__name__)
+    logger.info("DEPLOYMENT_TEST: Flask app initializing - Build 53 is active")
+    logger.info(f"DEPLOYMENT_TEST: Version {__version__} - Build date {__build_date__} - Commit {__commit_hash__}")
+    
     # Initialize Mail-Rulez components
     mail_config = get_config(base_dir=config_dir)
     security_manager = get_security_manager()
