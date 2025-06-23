@@ -17,3 +17,11 @@ logs/
 backups/
 config/
 .env
+# Documentation
+STATIC_SITE.MD
+# Server Scripts
+scripts/
+# Logs for Production Issues
+logs_for_defects/
+# Auto-generated version file
+version.py

@@ -101,7 +101,7 @@
     {% if current_user %}
     <footer class="bg-light text-center text-muted py-3 mt-5">
         <div class="container">
-            <small>{{ app_name }} v{{ version }} | {{ account_count }} accounts configured | Lists: {{ lists_dir }}</small>
+            <small>{{ app_name }} v{{ version }} | {{ account_count }} accounts configured | Built: {{ build_date }} | Commit: {{ commit_hash }}</small>
         </div>
     </footer>
     {% endif %}
