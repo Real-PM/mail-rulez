@@ -36,6 +36,7 @@ class TaskManager:
         self.processors: Dict[str, EmailProcessor] = {}
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
         self._lock = threading.Lock()
+        self._initialized = False  # Track initialization state
         
         # Configuration
         self.config = get_config()
@@ -270,6 +271,18 @@ class TaskManager:
         Returns:
             dict: Aggregated statistics
         """
+        # Return empty stats if not yet initialized to prevent race conditions
+        if not self._initialized:
+            self.logger.debug("Stats requested before initialization complete, returning empty stats")
+            return {
+                'total_processed': 0,
+                'total_pending': 0,
+                'total_errors': 0,
+                'average_processing_time': 0.0,
+                'last_processed': None,
+                'accounts_count': 0
+            }
+            
         with self._lock:
             total_processed = 0
             total_pending = 0
@@ -417,9 +430,11 @@ class TaskManager:
                 self.add_account(account_config)
             
             self.logger.info(f"Loaded {len(self.config.accounts)} accounts from configuration")
+            self._initialized = True  # Mark as fully initialized
             
         except Exception as e:
             self.logger.error(f"Failed to load accounts from config: {e}")
+            self._initialized = True  # Still mark as initialized even on error
     
     def refresh_accounts_from_config(self):
         """Refresh accounts from current configuration (reload config and sync accounts)"""

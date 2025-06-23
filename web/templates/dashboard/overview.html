@@ -214,6 +214,12 @@
 {% block extra_scripts %}
 <script>
 function refreshStats() {
+    if (refreshInProgress) {
+        console.log('Refresh already in progress, ignoring duplicate call');
+        return;
+    }
+    
+    refreshInProgress = true;
     console.log('Refreshing dashboard stats...');
     
     // Show loading indicator
@@ -241,9 +247,10 @@ function refreshStats() {
             location.reload();
         })
         .finally(() => {
-            // Restore refresh button
+            // Restore refresh button and reset flag
             refreshBtn.innerHTML = originalContent;
             refreshBtn.disabled = false;
+            refreshInProgress = false;
         });
 }
 
@@ -353,8 +360,16 @@ function getStatusIcon(status) {
     }
 }
 
-// Auto-refresh every 30 seconds
-setInterval(refreshStats, 30000);
+// Auto-refresh every 30 seconds with race condition protection
+let refreshInProgress = false;
+function safeRefreshStats() {
+    if (refreshInProgress) {
+        console.log('Refresh already in progress, skipping...');
+        return;
+    }
+    refreshStats();
+}
+setInterval(safeRefreshStats, 30000);
 
 // Load batch processing controls on page load
 document.addEventListener('DOMContentLoaded', function() {
