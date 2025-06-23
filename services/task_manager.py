@@ -352,10 +352,20 @@ class TaskManager:
         self.logger.info("Task manager shutdown complete")
     
     def _get_processor(self, account_email: str) -> Optional[EmailProcessor]:
-        """Get processor for account or log error if not found"""
+        """Get processor for account, with auto-recovery if missing"""
         processor = self.processors.get(account_email)
         if not processor:
-            self.logger.error(f"Account {account_email} not found")
+            # Auto-recovery: try to reload account from config
+            self.logger.warning(f"Account {account_email} not found in registry, attempting recovery")
+            try:
+                self.refresh_accounts_from_config()
+                processor = self.processors.get(account_email)
+                if processor:
+                    self.logger.info(f"Successfully recovered account {account_email}")
+                else:
+                    self.logger.error(f"Account {account_email} recovery failed - not in configuration")
+            except Exception as e:
+                self.logger.error(f"Account {account_email} recovery error: {e}")
         return processor
     
     def _log_task(self, task_type: str, details: Dict[str, Any]):
