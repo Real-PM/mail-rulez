@@ -62,7 +62,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="text-white-75 small">Emails Today</div>
-                            <div class="text-lg fw-bold">{{ processing_stats.total_processed_today or 0 }}</div>
+                            <div class="text-lg fw-bold" id="emails-today-display">{{ processing_stats.total_processed_today or 0 }}</div>
                         </div>
                         <div class="align-self-center">
                             <i class="bi bi-envelope-check fs-1"></i>
@@ -81,7 +81,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="text-white-75 small">Active Accounts</div>
-                            <div class="text-lg fw-bold">{{ account_count }}</div>
+                            <div class="text-lg fw-bold" id="active-accounts-display">{{ account_count }}</div>
                         </div>
                         <div class="align-self-center">
                             <i class="bi bi-person-gear fs-1"></i>
@@ -262,6 +262,22 @@ function updateDashboardData(data) {
             const memory = data.system.memory_percent || 0;
             document.querySelector('.card.bg-primary .text-lg.fw-bold').textContent = cpu.toFixed(1) + '%';
             document.querySelector('.card.bg-warning .text-lg.fw-bold').textContent = memory.toFixed(1) + '%';
+        }
+        
+        // Update account stats with validation
+        if (data.accounts) {
+            const activeAccounts = data.accounts.active_accounts;
+            if (activeAccounts !== undefined && activeAccounts !== null) {
+                document.getElementById('active-accounts-display').textContent = activeAccounts;
+            }
+        }
+        
+        // Update processing stats with validation  
+        if (data.processing) {
+            const emailsToday = data.processing.total_processed_today;
+            if (emailsToday !== undefined && emailsToday !== null) {
+                document.getElementById('emails-today-display').textContent = emailsToday;
+            }
         }
         
         // Update processing stats (Emails Today card)
