@@ -360,16 +360,8 @@ function getStatusIcon(status) {
     }
 }
 
-// Auto-refresh every 30 seconds with race condition protection
+// Auto-refresh disabled - manual refresh only
 let refreshInProgress = false;
-function safeRefreshStats() {
-    if (refreshInProgress) {
-        console.log('Refresh already in progress, skipping...');
-        return;
-    }
-    refreshStats();
-}
-setInterval(safeRefreshStats, 30000);
 
 // Load batch processing controls on page load
 document.addEventListener('DOMContentLoaded', function() {
