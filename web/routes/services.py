@@ -681,7 +681,7 @@ def get_inbox_count(account_email: str):
         # Get inbox count
         try:
             mb = processor.account.login()
-            inbox_count = len(mb.fetch('ALL'))
+            inbox_count = len(list(mb.fetch('ALL')))
         except Exception as e:
             logger.warning(f"Could not get inbox count for {account_email}: {e}")
             inbox_count = 0
