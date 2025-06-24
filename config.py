@@ -305,6 +305,26 @@ class Config:
         
         with open(self.secure_config_file, 'w') as f:
             json.dump(secure_data, f, indent=2)
+        
+        # Set secure permissions and ownership for container environment
+        try:
+            import os
+            import stat
+            
+            # Set file permissions to read/write for owner only
+            os.chmod(self.secure_config_file, stat.S_IRUSR | stat.S_IWUSR)
+            
+            # In container, set ownership to mailrulez user if running as root
+            if hasattr(os, 'getuid') and hasattr(os, 'chown'):
+                try:
+                    if os.getuid() == 0:  # Running as root
+                        os.chown(self.secure_config_file, 999, 999)  # mailrulez:mailrulez
+                except (OSError, PermissionError):
+                    # May fail if not running as root or user doesn't exist
+                    pass
+        except ImportError:
+            # os module not available (shouldn't happen, but be safe)
+            pass
     
     def _save_config_ini(self):
         """Save configuration to config.ini (legacy format)"""
@@ -320,6 +340,26 @@ class Config:
         
         with open(self.config_file, 'w') as f:
             config.write(f)
+        
+        # Set secure permissions and ownership for container environment
+        try:
+            import os
+            import stat
+            
+            # Set file permissions to read/write for owner only
+            os.chmod(self.config_file, stat.S_IRUSR | stat.S_IWUSR)
+            
+            # In container, set ownership to mailrulez user if running as root
+            if hasattr(os, 'getuid') and hasattr(os, 'chown'):
+                try:
+                    if os.getuid() == 0:  # Running as root
+                        os.chown(self.config_file, 999, 999)  # mailrulez:mailrulez
+                except (OSError, PermissionError):
+                    # May fail if not running as root or user doesn't exist
+                    pass
+        except ImportError:
+            # os module not available (shouldn't happen, but be safe)
+            pass
 
 
 # Global config instance - can be overridden for testing

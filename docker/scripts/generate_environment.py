@@ -50,6 +50,17 @@ def save_generated_keys(key_file_path, keys):
         
         # Set secure permissions (owner read/write only)
         os.chmod(key_file_path, 0o600)
+        
+        # Set ownership to mailrulez user (UID 999, GID 999) if running as root
+        try:
+            if os.getuid() == 0:  # Running as root
+                os.chown(key_file_path, 999, 999)  # mailrulez:mailrulez
+                logging.info(f"Set ownership of {key_file_path} to mailrulez:mailrulez")
+        except (OSError, AttributeError):
+            # AttributeError if os.getuid() not available on some systems
+            # OSError if permission denied or user doesn't exist
+            pass
+            
         logging.info(f"Generated keys saved to {key_file_path}")
         
     except IOError as e:

@@ -91,6 +91,16 @@ VERSION = __version__
     with open(version_py, 'w') as f:
         f.write(content)
     
+    # Set proper ownership in container environment
+    try:
+        import os
+        if hasattr(os, 'getuid') and hasattr(os, 'chown'):
+            if os.getuid() == 0:  # Running as root
+                os.chown(version_py, 999, 999)  # mailrulez:mailrulez
+    except (OSError, AttributeError):
+        # May fail if not running as root or user doesn't exist
+        pass
+    
     print(f"Generated version.py: {version_info['full_version']}")
     return version_py
 

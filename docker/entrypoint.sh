@@ -252,6 +252,15 @@ fi
 # Application-specific setup
 log_info "Initializing Mail-Rulez application..."
 
+# Generate version information if script exists
+if [ -f "/app/scripts/generate_version.py" ]; then
+    log_info "Generating version information..."
+    cd /app
+    python3 scripts/generate_version.py 2>/dev/null || {
+        log_warn "Could not generate version information - using defaults"
+    }
+fi
+
 # Set default Flask configuration if not provided
 export FLASK_PORT=${FLASK_PORT:-5001}
 export FLASK_HOST=${FLASK_HOST:-0.0.0.0}
