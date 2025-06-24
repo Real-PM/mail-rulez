@@ -455,14 +455,10 @@ class EmailProcessor:
         """Setup scheduler jobs based on current mode"""
         try:
             if self.mode == ProcessingMode.STARTUP:
-                # Startup mode jobs - run immediately then at intervals
-                self.scheduler.add_job(
-                    func=self._process_inbox_startup,
-                    trigger=IntervalTrigger(minutes=self.processing_intervals['inbox']),
-                    id=f'inbox_startup_{self.account_config.email}',
-                    replace_existing=True,
-                    next_run_time=datetime.now()  # Run immediately
-                )
+                # Startup mode: NO automatic jobs scheduled
+                # Processing only happens via manual API calls ("Process Next 100" button)
+                self.logger.info("Startup mode: Manual processing only - no automatic jobs scheduled")
+                return  # Exit early, no jobs scheduled
             else:
                 # Maintenance mode jobs - run immediately then at intervals
                 self.scheduler.add_job(
@@ -472,9 +468,9 @@ class EmailProcessor:
                     replace_existing=True,
                     next_run_time=datetime.now()  # Run immediately
                 )
-            
-            # Common jobs for both modes
-            self._setup_folder_processing_jobs()
+                
+                # Training folder jobs also run automatically in maintenance mode
+                self._setup_folder_processing_jobs()
             
         except Exception as e:
             self.logger.error(f"Failed to setup jobs: {e}")
@@ -535,6 +531,110 @@ class EmailProcessor:
             
         except Exception as e:
             self._handle_processing_error(e, "startup inbox processing")
+    
+    def process_manual_batch(self) -> Dict[str, Any]:
+        """
+        Manual processing for startup mode - combines all processing types
+        This method is called by the dashboard "Process Next 100" button
+        
+        Returns:
+            dict: Comprehensive processing results
+        """
+        if self.state != ServiceState.RUNNING_STARTUP:
+            raise ValueError("Manual batch processing only available in startup mode")
+            
+        try:
+            start_time = time.time()
+            batch_size = 100
+            
+            self.logger.info(f"Starting manual batch processing for {self.account_config.email} (batch size: {batch_size})")
+            
+            # Step 1: Execute user-created rules first
+            self.logger.info("Executing user-created rules...")
+            try:
+                self._execute_rules()
+            except Exception as e:
+                self.logger.warning(f"Rule execution failed: {e}")
+            
+            # Step 2: Process training folders
+            self.logger.info("Processing training folders...")
+            training_results = self._process_all_training_folders()
+            
+            # Step 3: Process inbox with batch limit
+            self.logger.info(f"Processing inbox (batch size: {batch_size})...")
+            inbox_result = pi.process_inbox(self.account, limit=batch_size)
+            
+            # Update statistics
+            processing_time = time.time() - start_time
+            self._update_stats(inbox_result, processing_time)
+            
+            # Reset error counter on successful processing
+            self.consecutive_errors = 0
+            
+            # Combine results
+            combined_result = {
+                'success': True,
+                'processing_time': processing_time,
+                'inbox_result': inbox_result,
+                'training_results': training_results,
+                'batch_size': batch_size,
+                'emails_processed': inbox_result.get('mail_list count', 0),
+                'emails_pending': len(inbox_result.get('uids in pending', [])),
+                'timestamp': datetime.now().isoformat()
+            }
+            
+            self.logger.info(f"Manual batch processing completed in {processing_time:.2f}s")
+            self.logger.info(f"Results: {combined_result['emails_processed']} processed, {combined_result['emails_pending']} pending")
+            
+            return combined_result
+            
+        except Exception as e:
+            self._handle_processing_error(e, "manual batch processing")
+            return {
+                'success': False,
+                'error': str(e),
+                'processing_time': 0,
+                'emails_processed': 0,
+                'emails_pending': 0,
+                'timestamp': datetime.now().isoformat()
+            }
+    
+    def _process_all_training_folders(self) -> Dict[str, Any]:
+        """Process all training folders and return results"""
+        results = {}
+        
+        # Get configured folder names
+        if hasattr(self.account_config, 'folders') and self.account_config.folders:
+            whitelist_folder = self.account_config.folders.get('whitelist', 'INBOX._whitelist')
+            blacklist_folder = self.account_config.folders.get('blacklist', 'INBOX._blacklist')
+            vendor_folder = self.account_config.folders.get('vendor', 'INBOX._vendor')
+            junk_folder = self.account_config.folders.get('junk', 'INBOX.Junk')
+            approved_ads_folder = self.account_config.folders.get('approved_ads', 'INBOX.Approved_Ads')
+        else:
+            # Fallback to hardcoded names
+            whitelist_folder = 'INBOX._whitelist'
+            blacklist_folder = 'INBOX._blacklist'
+            vendor_folder = 'INBOX._vendor'
+            junk_folder = 'INBOX.Junk'
+            approved_ads_folder = 'INBOX.Approved_Ads'
+            
+        # Process each training folder
+        training_folders = [
+            ('white', whitelist_folder, self.account_config.folders.get('processed', 'INBOX.Processed')),
+            ('black', blacklist_folder, junk_folder),
+            ('vendor', vendor_folder, approved_ads_folder)
+        ]
+        
+        for list_name, source_folder, dest_folder in training_folders:
+            try:
+                self.logger.debug(f"Processing training folder: {source_folder} -> {dest_folder}")
+                self._process_training_folder(list_name, source_folder, dest_folder)
+                results[list_name] = {'success': True, 'source': source_folder, 'dest': dest_folder}
+            except Exception as e:
+                self.logger.error(f"Failed to process training folder {source_folder}: {e}")
+                results[list_name] = {'success': False, 'error': str(e), 'source': source_folder, 'dest': dest_folder}
+                
+        return results
     
     def _process_inbox_maintenance(self):
         """Process inbox in maintenance mode with batch processing"""

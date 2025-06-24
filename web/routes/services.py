@@ -636,11 +636,8 @@ def process_batch(account_email: str):
                 'error': f'Batch processing only available in startup mode. Account is in {current_mode} mode.'
             }), 400
         
-        # Import the batch processing function
-        from process_inbox import process_inbox_batch
-        
-        # Run batch processing
-        batch_result = process_inbox_batch(processor.account, limit=limit)
+        # Use the new manual processing method that includes all rule types
+        batch_result = processor.process_manual_batch()
         
         return jsonify({
             'success': True,

@@ -43,27 +43,42 @@
                                 <span class="badge bg-secondary" id="connection-status-{{ loop.index0 }}">Unknown</span>
                             </td>
                             <td>
-                                <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex flex-column gap-2">
                                     <span class="badge bg-secondary" id="service-status-{{ loop.index0 }}">Stopped</span>
-                                    <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-sm btn-success service-btn" 
-                                                data-account="{{ account.email }}" data-index="{{ loop.index0 }}" 
-                                                data-action="start" id="start-btn-{{ loop.index0 }}" style="display: none;"
-                                                title="Start email processing service for this account">
-                                            <i class="fas fa-play"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger service-btn" 
-                                                data-account="{{ account.email }}" data-index="{{ loop.index0 }}" 
-                                                data-action="stop" id="stop-btn-{{ loop.index0 }}" style="display: none;"
-                                                title="Stop email processing service for this account">
-                                            <i class="fas fa-stop"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-warning service-btn" 
-                                                data-account="{{ account.email }}" data-index="{{ loop.index0 }}" 
-                                                data-action="restart" id="restart-btn-{{ loop.index0 }}" style="display: none;"
-                                                title="Restart email processing service for this account">
-                                            <i class="fas fa-redo"></i>
-                                        </button>
+                                    
+                                    <!-- Service Control Buttons - Enhanced for Clarity -->
+                                    <div class="btn-group-vertical" role="group" id="service-controls-{{ loop.index0 }}">
+                                        <!-- Start Options (shown when stopped) -->
+                                        <div class="btn-group" role="group" id="start-options-{{ loop.index0 }}" style="display: none;">
+                                            <button type="button" class="btn btn-primary service-btn" 
+                                                    data-account="{{ account.email }}" data-index="{{ loop.index0 }}" 
+                                                    data-action="start" data-mode="startup" id="start-startup-btn-{{ loop.index0 }}"
+                                                    title="Start in Startup Mode: Manual processing only, perfect for initial setup">
+                                                <i class="bi bi-play-circle"></i> Start Startup Mode
+                                            </button>
+                                            <button type="button" class="btn btn-success service-btn" 
+                                                    data-account="{{ account.email }}" data-index="{{ loop.index0 }}" 
+                                                    data-action="start" data-mode="maintenance" id="start-maintenance-btn-{{ loop.index0 }}"
+                                                    title="Start in Maintenance Mode: Automatic processing every 5 minutes">
+                                                <i class="bi bi-gear"></i> Start Maintenance Mode
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Running Controls (shown when running) -->
+                                        <div class="btn-group" role="group" id="running-controls-{{ loop.index0 }}" style="display: none;">
+                                            <button type="button" class="btn btn-warning service-btn" 
+                                                    data-account="{{ account.email }}" data-index="{{ loop.index0 }}" 
+                                                    data-action="restart" id="restart-btn-{{ loop.index0 }}"
+                                                    title="Restart email processing service">
+                                                <i class="bi bi-arrow-clockwise"></i> Restart
+                                            </button>
+                                            <button type="button" class="btn btn-danger service-btn" 
+                                                    data-account="{{ account.email }}" data-index="{{ loop.index0 }}" 
+                                                    data-action="stop" id="stop-btn-{{ loop.index0 }}"
+                                                    title="Stop email processing service">
+                                                <i class="bi bi-stop-circle"></i> Stop
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -167,12 +182,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const actionText = action.charAt(0).toUpperCase() + action.slice(1);
                 showToast(`${actionText} request sent for ${accountEmail}. Processing...`, 'info');
                 
+                // Get mode for start actions
+                const mode = this.dataset.mode || 'startup';
+                const requestBody = action === 'start' ? { mode: mode } : {};
+                
                 const response = await fetch(`/api/services/accounts/${accountEmail}/${action}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({})
+                    body: JSON.stringify(requestBody)
                 });
                 
                 const result = await response.json();
@@ -200,9 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update service status for an account
     async function updateServiceStatus(accountEmail, index) {
         const serviceStatusBadge = document.getElementById(`service-status-${index}`);
-        const startBtn = document.getElementById(`start-btn-${index}`);
-        const stopBtn = document.getElementById(`stop-btn-${index}`);
-        const restartBtn = document.getElementById(`restart-btn-${index}`);
+        const startOptions = document.getElementById(`start-options-${index}`);
+        const runningControls = document.getElementById(`running-controls-${index}`);
         
         try {
             const response = await fetch(`/api/services/accounts/${accountEmail}/status`);
@@ -212,39 +230,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 const status = result.data;
                 
                 // Update status badge
-                serviceStatusBadge.textContent = status.state;
+                let statusText = status.state;
+                if (status.state === 'running_startup') {
+                    statusText = `Running (Startup Mode)`;
+                } else if (status.state === 'running_maintenance') {
+                    statusText = `Running (Maintenance Mode)`;
+                }
+                serviceStatusBadge.textContent = statusText;
                 serviceStatusBadge.className = `badge ${getStatusBadgeClass(status.state)}`;
                 
-                // Show/hide appropriate buttons based on current state
+                // Show/hide appropriate button groups based on current state
                 if (status.state === 'stopped' || status.state === 'error') {
-                    // Account is stopped or in error state - show start button
-                    startBtn.style.display = 'inline-block';
-                    stopBtn.style.display = 'none';
-                    restartBtn.style.display = 'none';
+                    // Account is stopped or in error state - show start options
+                    startOptions.style.display = 'block';
+                    runningControls.style.display = 'none';
                 } else if (status.state === 'running_startup' || status.state === 'running_maintenance') {
-                    // Account is actively running - show stop and restart buttons
-                    startBtn.style.display = 'none';
-                    stopBtn.style.display = 'inline-block';
-                    restartBtn.style.display = 'inline-block';
+                    // Account is actively running - show running controls
+                    startOptions.style.display = 'none';
+                    runningControls.style.display = 'block';
                 } else if (status.state === 'starting' || status.state === 'stopping') {
-                    // Account is transitioning - show no action buttons to prevent conflicts
-                    startBtn.style.display = 'none';
-                    stopBtn.style.display = 'none';
-                    restartBtn.style.display = 'none';
+                    // Account is transitioning - hide all controls to prevent conflicts
+                    startOptions.style.display = 'none';
+                    runningControls.style.display = 'none';
                 } else {
-                    // Unknown state - default to showing start button
-                    startBtn.style.display = 'inline-block';
-                    stopBtn.style.display = 'none';
-                    restartBtn.style.display = 'none';
+                    // Unknown state - default to showing start options
+                    startOptions.style.display = 'block';
+                    runningControls.style.display = 'none';
                 }
             } else {
                 console.error(`API error for ${accountEmail}:`, result.error);
-                // On API error, show default state (stopped with start button)
+                // On API error, show default state (stopped with start options)
                 setDefaultServiceState(index);
             }
         } catch (error) {
             console.error(`Failed to update service status for ${accountEmail}:`, error);
-            // On network error, show default state (stopped with start button)
+            // On network error, show default state (stopped with start options)
             setDefaultServiceState(index);
         }
     }
@@ -252,16 +272,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to set default service state when API fails
     function setDefaultServiceState(index) {
         const serviceStatusBadge = document.getElementById(`service-status-${index}`);
-        const startBtn = document.getElementById(`start-btn-${index}`);
-        const stopBtn = document.getElementById(`stop-btn-${index}`);
-        const restartBtn = document.getElementById(`restart-btn-${index}`);
+        const startOptions = document.getElementById(`start-options-${index}`);
+        const runningControls = document.getElementById(`running-controls-${index}`);
         
-        // Default to stopped state with start button visible
+        // Default to stopped state with start options visible
         serviceStatusBadge.textContent = 'Stopped';
         serviceStatusBadge.className = 'badge bg-secondary';
-        startBtn.style.display = 'inline-block';
-        stopBtn.style.display = 'none';
-        restartBtn.style.display = 'none';
+        startOptions.style.display = 'block';
+        runningControls.style.display = 'none';
     }
     
     // Function to get appropriate CSS class for status
@@ -307,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load service status for all accounts on page load
     async function loadAllServiceStatus() {
         // Find service buttons specifically (they have the account email and proper index)
-        const serviceButtons = document.querySelectorAll('.service-btn[data-action="start"]');
+        const serviceButtons = document.querySelectorAll('.service-btn[data-action="start"][data-mode="startup"]');
         
         // First, set all accounts to default state immediately to show buttons
         serviceButtons.forEach(button => {
