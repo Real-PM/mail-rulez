@@ -562,7 +562,7 @@ class EmailProcessor:
             
             # Step 3: Process inbox with batch limit
             self.logger.info(f"Processing inbox (batch size: {batch_size})...")
-            inbox_result = pi.process_inbox(self.account, limit=batch_size)
+            inbox_result = pi.process_inbox_batch(self.account, limit=batch_size)
             
             # Update statistics
             processing_time = time.time() - start_time
@@ -578,8 +578,8 @@ class EmailProcessor:
                 'inbox_result': inbox_result,
                 'training_results': training_results,
                 'batch_size': batch_size,
-                'emails_processed': inbox_result.get('mail_list count', 0),
-                'emails_pending': len(inbox_result.get('uids in pending', [])),
+                'emails_processed': inbox_result.get('emails_processed', 0),
+                'emails_pending': inbox_result.get('inbox_remaining', 0),
                 'timestamp': datetime.now().isoformat()
             }
             
@@ -691,11 +691,19 @@ class EmailProcessor:
             else:
                 self.stats.avg_processing_time = (self.stats.avg_processing_time + processing_time) / 2
             
-            # Update email counts from result
-            if 'mail_list count' in result:
+            # Update email counts from result (handle both old and new result formats)
+            if 'emails_processed' in result:
+                # New format from process_inbox_batch
+                self.stats.emails_processed += result['emails_processed']
+            elif 'mail_list count' in result:
+                # Old format from process_inbox
                 self.stats.emails_processed += result['mail_list count']
                 
-            if 'uids in pending' in result:
+            if 'inbox_remaining' in result:
+                # New format from process_inbox_batch
+                self.stats.emails_pending = result['inbox_remaining']
+            elif 'uids in pending' in result:
+                # Old format from process_inbox
                 self.stats.emails_pending = len(result['uids in pending'])
     
     def _handle_processing_error(self, error: Exception, operation: str):
