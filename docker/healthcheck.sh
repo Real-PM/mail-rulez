@@ -61,8 +61,8 @@ check_disk_space() {
     # Check disk usage for critical directories
     for dir in "/app/logs" "/app/data" "/app"; do
         if [ -d "$dir" ]; then
-            usage=$(df "$dir" | awk 'NR==2 {print $5}' | sed 's/%//')
-            if [ "$usage" -gt "$threshold" ]; then
+            usage=$(df "$dir" | tail -1 | awk '{print $5}' | sed 's/%//')
+            if [ -n "$usage" ] && [ "$usage" -gt "$threshold" ]; then
                 log_health "WARNING: Disk usage high for $dir: ${usage}%"
                 return 1
             fi
@@ -139,8 +139,8 @@ check_email_services() {
     
     local services_healthy=true
     
-    # Check if we can import required Python modules
-    if ! python -c "import services.task_manager; import services.email_processor" 2>/dev/null; then
+    # Check if we can import required Python modules (must be in /app directory)
+    if ! (cd /app && python -c "import services.task_manager; import services.email_processor" 2>/dev/null); then
         log_health "ERROR: Cannot import email processing modules"
         services_healthy=false
     fi
