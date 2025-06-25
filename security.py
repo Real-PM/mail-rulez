@@ -62,6 +62,20 @@ class SecurityManager:
         except Exception as e:
             print(f"Warning: Could not read master key file: {e}")
         
+        # Also try generated-keys.json file (used by environment generation script)
+        try:
+            import json
+            config_dir = os.getenv('MAIL_RULEZ_CONFIG_DIR', '/app/config')
+            generated_keys_file = os.path.join(config_dir, 'generated-keys.json')
+            if os.path.exists(generated_keys_file):
+                with open(generated_keys_file, 'r') as f:
+                    keys_data = json.load(f)
+                    key_b64 = keys_data.get('MASTER_KEY')
+                    if key_b64:
+                        return base64.urlsafe_b64decode(key_b64)
+        except Exception as e:
+            print(f"Warning: Could not read generated keys file: {e}")
+        
         # Generate new key and save to file
         key = Fernet.generate_key()
         key_b64 = base64.urlsafe_b64encode(key).decode()
