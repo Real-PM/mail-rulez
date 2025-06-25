@@ -257,11 +257,36 @@ if [ -f "/app/scripts/generate_version.py" ]; then
     log_info "Generating version information..."
     cd /app
     
-    # Use build-time commit hash if provided, otherwise detect from git
-    if [ -n "${BUILD_COMMIT_HASH}" ]; then
-        log_info "Using build-time commit hash: ${BUILD_COMMIT_HASH}"
-        # Create a modified version script that uses the build-time hash
+    # Check if build-time version file exists (created during Docker build)
+    if [ -f "/app/.build_version" ]; then
+        log_info "Using build-time version information from .build_version"
+        source /app/.build_version
+        
+        # Create version file using build-time information
         python3 -c "
+import sys
+sys.path.append('/app')
+from scripts.generate_version import generate_version_info, write_version_py
+
+# Override the git commit hash detection with build-time value
+def get_git_commit_hash():
+    return '${BUILD_COMMIT_HASH:-unknown}'
+
+# Monkey patch the function
+import scripts.generate_version
+scripts.generate_version.get_git_commit_hash = get_git_commit_hash
+
+# Generate version with build-time commit hash
+version_info = generate_version_info()
+write_version_py(version_info)
+print('Version file written to: /app/version.py')
+"
+    else
+        # Use build-time commit hash if provided, otherwise detect from git
+        if [ -n "${BUILD_COMMIT_HASH}" ]; then
+            log_info "Using build-time commit hash: ${BUILD_COMMIT_HASH}"
+            # Create a modified version script that uses the build-time hash
+            python3 -c "
 import sys
 sys.path.append('/app')
 from scripts.generate_version import generate_version_info, write_version_py
@@ -279,10 +304,11 @@ version_info = generate_version_info()
 write_version_py(version_info)
 print('Version file written to: /app/version.py')
 "
-    else
-        python3 scripts/generate_version.py 2>/dev/null || {
-            log_warn "Could not generate version information - using defaults"
-        }
+        else
+            python3 scripts/generate_version.py 2>/dev/null || {
+                log_warn "Could not generate version information - using defaults"
+            }
+        fi
     fi
 fi
 
