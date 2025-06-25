@@ -1,11 +1,17 @@
 # Local development Dockerfile with minimal networking requirements
 FROM python:3.10-slim AS base
 
+# Build arguments for version information
+ARG BUILD_COMMIT_HASH
+ARG BUILD_DATE
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    BUILD_COMMIT_HASH=${BUILD_COMMIT_HASH} \
+    BUILD_DATE=${BUILD_DATE}
 
 # Create app user for security
 RUN groupadd -r mailrulez && useradd -r -g mailrulez mailrulez
