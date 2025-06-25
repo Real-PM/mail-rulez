@@ -12,9 +12,10 @@ services:
     container_name: mail-rulez-simple
     restart: unless-stopped
     
-    # Port mapping
-    ports:
-      - "5001:5001"
+    # Network configuration - no external ports needed
+    # Caddy will connect via internal Docker network
+    networks:
+      - caddy-network
     
     # Environment variables with secure defaults
     environment:
@@ -86,3 +87,8 @@ volumes:
   
   mail_rulez_config:
     driver: local
+
+# External networks
+networks:
+  caddy-network:
+    external: true
