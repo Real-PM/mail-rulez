@@ -3,11 +3,17 @@
 
 FROM python:3.10-slim AS base
 
+# Build arguments for version information
+ARG BUILD_COMMIT_HASH
+ARG BUILD_DATE
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    BUILD_COMMIT_HASH=${BUILD_COMMIT_HASH} \
+    BUILD_DATE=${BUILD_DATE}
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -64,6 +70,10 @@ RUN pip install -r requirements.txt && \
 
 # Copy application code
 COPY . .
+
+# Create build-time version file
+RUN echo "BUILD_COMMIT_HASH=${BUILD_COMMIT_HASH:-unknown}" > /app/.build_version && \
+    echo "BUILD_DATE=${BUILD_DATE:-unknown}" >> /app/.build_version
 
 # Set configurable paths for production
 ENV MAIL_RULEZ_APP_DIR=/app \
