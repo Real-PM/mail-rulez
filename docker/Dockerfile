@@ -72,8 +72,8 @@ RUN pip install -r requirements.txt && \
 COPY . .
 
 # Create build-time version file
-RUN echo "BUILD_COMMIT_HASH=${BUILD_COMMIT_HASH:-unknown}" > /app/.build_version && \
-    echo "BUILD_DATE=${BUILD_DATE:-unknown}" >> /app/.build_version
+RUN echo "BUILD_COMMIT_HASH=\"${BUILD_COMMIT_HASH:-unknown}\"" > /app/.build_version && \
+    echo "BUILD_DATE=\"${BUILD_DATE:-unknown}\"" >> /app/.build_version
 
 # Set configurable paths for production
 ENV MAIL_RULEZ_APP_DIR=/app \

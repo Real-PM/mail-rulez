@@ -224,7 +224,11 @@ fi
 
 # Resource monitoring setup
 log_info "System resources:"
-log_info "  Memory: $(free -h | awk '/^Mem:/ {print $2}') total, $(free -h | awk '/^Mem:/ {print $7}') available"
+if command -v free >/dev/null 2>&1; then
+    log_info "  Memory: $(free -h | awk '/^Mem:/ {print $2}') total, $(free -h | awk '/^Mem:/ {print $7}') available"
+else
+    log_info "  Memory: not available (free command not installed)"
+fi
 log_info "  Disk: $(df -h /app | awk 'NR==2 {print $4}') free space"
 log_info "  CPU cores: $(nproc)"
 
