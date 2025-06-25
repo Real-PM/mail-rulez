@@ -109,6 +109,15 @@ def create_app(config_dir=None, testing=False):
     app.register_blueprint(services_bp)
     app.register_blueprint(logs_bp)
     
+    # Temporary debug route
+    if not testing:
+        try:
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent.parent))
+            from debug_route import debug_bp
+            app.register_blueprint(debug_bp)
+        except ImportError:
+            pass
     
     # Exempt API services from CSRF protection
     csrf.exempt(services_bp)
