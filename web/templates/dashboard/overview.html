@@ -61,16 +61,16 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <div class="text-white-75 small">Emails Today</div>
-                            <div class="text-lg fw-bold" id="emails-today-display">{{ processing_stats.total_processed_today or 0 }}</div>
+                            <div class="text-white-75 small">System Status</div>
+                            <div class="text-lg fw-bold">Healthy</div>
                         </div>
                         <div class="align-self-center">
-                            <i class="bi bi-envelope-check fs-1"></i>
+                            <i class="bi bi-check-circle fs-1"></i>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <div class="small text-white-75">Daily email processing count</div>
+                    <div class="small text-white-75">Container running normally</div>
                 </div>
             </div>
         </div>
@@ -80,16 +80,16 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <div class="text-white-75 small">Active Accounts</div>
-                            <div class="text-lg fw-bold" id="active-accounts-display">{{ account_count }}</div>
+                            <div class="text-white-75 small">Service Mode</div>
+                            <div class="text-lg fw-bold">{{ "Startup" if account_count > 0 else "Setup" }}</div>
                         </div>
                         <div class="align-self-center">
-                            <i class="bi bi-person-gear fs-1"></i>
+                            <i class="bi bi-gear fs-1"></i>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="{{ url_for('accounts.list_accounts') }}">Manage Accounts</a>
+                    <a class="small text-white stretched-link" href="{{ url_for('accounts.list_accounts') }}">{{ "Manage Accounts" if account_count > 0 else "Add Account" }}</a>
                     <div class="small text-white"><i class="bi bi-angle-right"></i></div>
                 </div>
             </div>
@@ -131,24 +131,24 @@
         <div class="col-lg-8">
             <div class="card mb-4">
                 <div class="card-header">
-                    <i class="bi bi-bar-chart"></i> Email Processing Statistics
+                    <i class="bi bi-info-circle"></i> Quick Start Guide
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6>Today's Processing</h6>
+                            <h6>Getting Started</h6>
                             <ul class="list-unstyled">
-                                <li><i class="bi bi-check-circle text-success"></i> Whitelisted: {{ processing_stats.whitelisted_today or 0 }}</li>
-                                <li><i class="bi bi-x-circle text-danger"></i> Blacklisted: {{ processing_stats.blacklisted_today or 0 }}</li>
-                                <li><i class="bi bi-clock text-warning"></i> Pending: {{ processing_stats.pending_count or 0 }}</li>
+                                <li><i class="bi bi-1-circle text-primary"></i> <a href="{{ url_for('accounts.list_accounts') }}">Configure email accounts</a></li>
+                                <li><i class="bi bi-2-circle text-primary"></i> <a href="{{ url_for('lists.manage_lists') }}">Set up your lists</a></li>
+                                <li><i class="bi bi-3-circle text-primary"></i> <a href="{{ url_for('rules.list_rules') }}">Create processing rules</a></li>
                             </ul>
                         </div>
                         <div class="col-md-6">
-                            <h6>System Status</h6>
+                            <h6>System Information</h6>
                             <ul class="list-unstyled">
-                                <li><i class="bi bi-clock-history"></i> Last Run: {{ processing_stats.last_run or 'Never' }}</li>
-                                <li><i class="bi bi-speedometer"></i> Avg Time: {{ processing_stats.avg_processing_time or '0.5s' }}</li>
-                                <li><i class="bi bi-exclamation-triangle"></i> Errors: {{ processing_stats.processing_errors or 0 }}</li>
+                                <li><i class="bi bi-server"></i> Service: Mail-Rulez v{{ version }}</li>
+                                <li><i class="bi bi-shield-check"></i> Security: Encrypted storage</li>
+                                <li><i class="bi bi-gear"></i> Mode: {{ "Startup (Manual)" if account_count > 0 else "Setup Required" }}</li>
                             </ul>
                         </div>
                     </div>
@@ -269,7 +269,7 @@ function refreshStats() {
 
 function updateDashboardData(data) {
     try {
-        // Update system stats (CPU, Memory, etc.)
+        // Update system stats (CPU, Memory only - static cards don't need updates)
         if (data.system) {
             const cpu = data.system.cpu_percent || 0;
             const memory = data.system.memory_percent || 0;
@@ -277,59 +277,7 @@ function updateDashboardData(data) {
             document.querySelector('.card.bg-warning .text-lg.fw-bold').textContent = memory.toFixed(1) + '%';
         }
         
-        // Update account stats with validation
-        if (data.accounts) {
-            const activeAccounts = data.accounts.active_accounts;
-            if (activeAccounts !== undefined && activeAccounts !== null) {
-                document.getElementById('active-accounts-display').textContent = activeAccounts;
-            }
-        }
-        
-        // Update processing stats with validation  
-        if (data.processing) {
-            const emailsToday = data.processing.total_processed_today;
-            if (emailsToday !== undefined && emailsToday !== null) {
-                document.getElementById('emails-today-display').textContent = emailsToday;
-            }
-        }
-        
-        // Update processing stats (Emails Today card)
-        if (data.processing) {
-            const emailsToday = data.processing.total_processed_today || 0;
-            document.querySelector('.card.bg-success .text-lg.fw-bold').textContent = emailsToday;
-            
-            // Update processing statistics section
-            const whitelisted = data.processing.whitelisted_today || 0;
-            const blacklisted = data.processing.blacklisted_today || 0;
-            const pending = data.processing.pending_count || 0;
-            const lastRun = data.processing.last_run || 'Never';
-            const avgTime = data.processing.avg_processing_time || 'N/A';
-            const errors = data.processing.processing_errors || 0;
-            
-            // Update processing details in the Email Processing Statistics card
-            const processingCard = document.querySelector('[data-card="processing-stats"]') || 
-                                 document.querySelector('.card-header:contains("Email Processing Statistics")').closest('.card');
-            
-            if (processingCard) {
-                const lists = processingCard.querySelectorAll('li');
-                if (lists.length >= 6) {
-                    lists[0].innerHTML = `<i class="bi bi-check-circle text-success"></i> Whitelisted: ${whitelisted}`;
-                    lists[1].innerHTML = `<i class="bi bi-x-circle text-danger"></i> Blacklisted: ${blacklisted}`;
-                    lists[2].innerHTML = `<i class="bi bi-clock text-warning"></i> Pending: ${pending}`;
-                    lists[3].innerHTML = `<i class="bi bi-clock-history"></i> Last Run: ${lastRun}`;
-                    lists[4].innerHTML = `<i class="bi bi-speedometer"></i> Avg Time: ${avgTime}`;
-                    lists[5].innerHTML = `<i class="bi bi-exclamation-triangle"></i> Errors: ${errors}`;
-                }
-            }
-        }
-        
-        // Update account stats (Active Accounts card)
-        if (data.accounts) {
-            const activeAccounts = data.accounts.active_accounts || 0;
-            document.querySelector('.card.bg-info .text-lg.fw-bold').textContent = activeAccounts;
-        }
-        
-        // Update recent activity
+        // Update recent activity only
         if (data.recent_activity) {
             updateRecentActivity(data.recent_activity);
         }
