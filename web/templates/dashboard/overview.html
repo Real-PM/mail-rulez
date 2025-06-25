@@ -105,12 +105,18 @@
                     <small class="text-muted ms-2">Manual control, 100 emails at a time</small>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info mb-3">
-                        <i class="bi bi-info-circle"></i>
-                        <strong>Manual Processing Only:</strong> 
-                        In startup mode, emails are only processed when you click the "Process Next 100" button. 
-                        No automatic processing occurs - you have complete control over when and how many emails are processed.
-                        This prevents inbox overwhelm during initial setup.
+                    <div class="bg-light border border-info rounded p-3 mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-info-circle text-info me-2 mt-1"></i>
+                            <div>
+                                <h6 class="text-info mb-2">Manual Processing Only</h6>
+                                <p class="mb-0 text-muted">
+                                    In startup mode, emails are only processed when you click the "Process Next 100" button. 
+                                    No automatic processing occurs - you have complete control over when and how many emails are processed.
+                                    This prevents inbox overwhelm during initial setup.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     <div id="batch-processing-accounts">
                         <!-- Dynamically populated per account -->
@@ -393,8 +399,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadBatchProcessingControls() {
     try {
-        // Get system status to check for startup mode accounts
-        const response = await fetch('/api/services/status');
+        // Get system status to check for startup mode accounts (with timeout)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch('/api/services/status', {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const data = await response.json();
         
         if (!data.success || !data.data.accounts) {
@@ -427,33 +444,23 @@ async function loadBatchProcessingControls() {
 async function buildBatchProcessingControls(accounts) {
     const container = document.getElementById('batch-processing-accounts');
     
+    // Build UI immediately with loading indicators
     let html = '';
     for (const accountEmail of accounts) {
-        // Get inbox count for this account
-        let inboxCount = 0;
-        try {
-            const countResponse = await fetch(`/api/services/accounts/${encodeURIComponent(accountEmail)}/inbox-count`);
-            const countData = await countResponse.json();
-            if (countData.success) {
-                inboxCount = countData.data.inbox_count;
-            }
-        } catch (error) {
-            console.warn(`Could not get inbox count for ${accountEmail}:`, error);
-        }
-        
+        const safeEmail = accountEmail.replace(/[^a-zA-Z0-9]/g, '_');
         html += `
-            <div class="account-batch-control mb-3" data-account="${accountEmail}">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>${accountEmail}</strong>
-                        <div class="small text-muted">
-                            <span class="inbox-count">${inboxCount}</span> emails in inbox
-                        </div>
-                    </div>
+            <div class="row mb-3 account-batch-control" data-account="${accountEmail}">
+                <div class="col-md-6">
+                    <h6>${accountEmail}</h6>
+                    <small class="text-muted">
+                        Inbox: <span class="inbox-count" id="inbox-count-${safeEmail}">Loading...</span> emails
+                    </small>
+                </div>
+                <div class="col-md-6 text-end">
                     <div>
                         <button class="btn btn-primary btn-sm process-batch-btn" 
                                 data-account="${accountEmail}"
-                                ${inboxCount === 0 ? 'disabled' : ''}
+                                disabled
                                 onclick="processBatch('${accountEmail}')">
                             <i class="bi bi-play-circle"></i> Process Next 100
                         </button>
@@ -468,6 +475,49 @@ async function buildBatchProcessingControls(accounts) {
     }
     
     container.innerHTML = html;
+    
+    // Load inbox counts asynchronously in parallel
+    const countPromises = accounts.map(async (accountEmail) => {
+        const safeEmail = accountEmail.replace(/[^a-zA-Z0-9]/g, '_');
+        const countSpan = document.getElementById(`inbox-count-${safeEmail}`);
+        const button = document.querySelector(`button[data-account="${accountEmail}"]`);
+        
+        try {
+            // Add timeout to inbox count request
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+            
+            const countResponse = await fetch(`/api/services/accounts/${encodeURIComponent(accountEmail)}/inbox-count`, {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            
+            const countData = await countResponse.json();
+            if (countData.success) {
+                const inboxCount = countData.data.inbox_count;
+                countSpan.textContent = inboxCount;
+                
+                // Enable button if there are emails to process
+                if (inboxCount > 0) {
+                    button.disabled = false;
+                } else {
+                    button.innerHTML = '<i class="bi bi-check-circle"></i> Inbox Empty';
+                }
+            } else {
+                throw new Error(countData.error || 'Failed to get inbox count');
+            }
+        } catch (error) {
+            console.warn(`Could not get inbox count for ${accountEmail}:`, error);
+            countSpan.textContent = 'Error';
+            countSpan.className = 'inbox-count text-danger';
+            button.disabled = false; // Allow user to try anyway
+        }
+    });
+    
+    // Wait for all counts to complete (but don't block the UI)
+    Promise.allSettled(countPromises).then(() => {
+        console.log('All inbox counts loaded');
+    });
 }
 
 async function processBatch(accountEmail) {
@@ -502,24 +552,32 @@ async function processBatch(accountEmail) {
             progressBar.classList.remove('progress-bar-animated', 'progress-bar-striped');
             progressBar.classList.add('bg-success');
             
-            // Update inbox count
-            inboxCountSpan.textContent = data.data.inbox_remaining;
+            // Update inbox count based on emails pending
+            inboxCountSpan.textContent = data.data.emails_pending;
             
             // Show results
             const result = data.data;
+            const inboxResult = result.inbox_result || {};
+            const categories = inboxResult.categories || {
+                whitelisted: 0,
+                blacklisted: 0, 
+                vendor: 0,
+                pending: result.emails_pending || 0
+            };
+            
             resultDiv.innerHTML = `
                 <div class="alert alert-success alert-sm">
                     <strong>Processed ${result.emails_processed} emails:</strong>
-                    ${result.categories.whitelisted} to Processed, 
-                    ${result.categories.blacklisted} to Junk, 
-                    ${result.categories.vendor} to Approved Ads, 
-                    ${result.categories.pending} to Pending
+                    ${categories.whitelisted || 0} to Processed, 
+                    ${categories.blacklisted || 0} to Junk, 
+                    ${categories.vendor || 0} to Approved Ads, 
+                    ${categories.pending || 0} remaining in Pending
                 </div>
             `;
             resultDiv.style.display = 'block';
             
             // Re-enable button if more emails remain
-            if (result.has_more) {
+            if (result.emails_pending > 0) {
                 button.disabled = false;
                 button.innerHTML = '<i class="bi bi-play-circle"></i> Process Next 100';
             } else {
