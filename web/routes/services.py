@@ -7,24 +7,34 @@ email processing services across multiple accounts.
 """
 
 import logging
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, redirect, url_for
 from werkzeug.exceptions import BadRequest, NotFound
+from functools import wraps
 
 from services.task_manager import get_task_manager
 from services.email_processor import ProcessingMode, ServiceState
-# TODO: Import correct authentication decorator
 
 # Create blueprint
 services_bp = Blueprint('services', __name__, url_prefix='/api/services')
 logger = logging.getLogger(__name__)
 
 
+def login_required(f):
+    """Decorator to require authentication for API routes"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_app.get_current_user():
+            # For API endpoints, return JSON error instead of redirect
+            return jsonify({'success': False, 'error': 'Authentication required'}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @services_bp.before_request
 def before_request():
     """Check authentication for all service endpoints"""
-    # TODO: Add proper authentication check
-    # For now, skip authentication to test functionality
-    pass
+    if not current_app.get_current_user():
+        return jsonify({'success': False, 'error': 'Authentication required'}), 401
 
 
 @services_bp.route('/status', methods=['GET'])
