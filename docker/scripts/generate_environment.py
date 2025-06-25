@@ -71,17 +71,17 @@ def save_generated_keys(key_file_path, keys):
 def ensure_environment_variable(var_name, generator_func, existing_keys, force_regenerate=False):
     """Ensure an environment variable exists, generating if needed."""
     
-    # Check if already set in environment
-    if not force_regenerate and os.getenv(var_name):
-        logging.info(f"{var_name} already set in environment")
-        return os.getenv(var_name)
-    
-    # Check if we have a saved key
+    # Always prefer saved keys over environment variables for security
     if not force_regenerate and var_name in existing_keys:
         key_value = existing_keys[var_name]
         os.environ[var_name] = key_value
         logging.info(f"{var_name} loaded from persistent storage")
         return key_value
+    
+    # Check if already set in environment (only if no saved key)
+    if not force_regenerate and os.getenv(var_name):
+        logging.info(f"{var_name} already set in environment")
+        return os.getenv(var_name)
     
     # Generate new key
     key_value = generator_func()
