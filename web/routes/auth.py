@@ -153,6 +153,25 @@ def needs_initial_setup():
     """Check if initial setup is needed"""
     # Check if admin user exists in config directory (persistent storage)
     admin_file = current_app.mail_config.config_dir / '.admin_user'
+    
+    # Migration: check old location and move to new location if needed
+    old_admin_file = current_app.mail_config.base_dir / '.admin_user'
+    
+    if not admin_file.exists() and old_admin_file.exists():
+        try:
+            # Migrate admin file from old location to new persistent location
+            admin_file.parent.mkdir(parents=True, exist_ok=True)
+            admin_file.write_text(old_admin_file.read_text())
+            admin_file.chmod(0o600)
+            
+            # Remove old file
+            old_admin_file.unlink()
+            
+            current_app.logger.info("Migrated admin file from base_dir to config_dir")
+            return False  # Setup not needed, migration completed
+        except Exception as e:
+            current_app.logger.error(f"Failed to migrate admin file: {e}")
+    
     return not admin_file.exists()
 
 

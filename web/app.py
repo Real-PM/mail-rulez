@@ -109,6 +109,7 @@ def create_app(config_dir=None, testing=False):
     app.register_blueprint(services_bp)
     app.register_blueprint(logs_bp)
     
+    
     # Exempt API services from CSRF protection
     csrf.exempt(services_bp)
     
