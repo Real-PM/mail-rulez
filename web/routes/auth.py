@@ -151,8 +151,8 @@ def setup():
 
 def needs_initial_setup():
     """Check if initial setup is needed"""
-    # Check if admin user exists
-    admin_file = current_app.mail_config.base_dir / '.admin_user'
+    # Check if admin user exists in config directory (persistent storage)
+    admin_file = current_app.mail_config.config_dir / '.admin_user'
     return not admin_file.exists()
 
 
@@ -162,10 +162,12 @@ def create_admin_user(username, password):
         # Hash the password
         hashed_password = current_app.security_manager.hash_user_password(password)
         
-        # Store admin credentials
-        admin_file = current_app.mail_config.base_dir / '.admin_user'
+        # Store admin credentials in config directory (persistent storage)
+        admin_file = current_app.mail_config.config_dir / '.admin_user'
         admin_data = f"{username}:{hashed_password}"
         
+        # Ensure config directory exists
+        admin_file.parent.mkdir(parents=True, exist_ok=True)
         admin_file.write_text(admin_data)
         
         # Set restrictive permissions
@@ -180,7 +182,7 @@ def create_admin_user(username, password):
 def verify_user_credentials(username, password):
     """Verify user login credentials"""
     try:
-        admin_file = current_app.mail_config.base_dir / '.admin_user'
+        admin_file = current_app.mail_config.config_dir / '.admin_user'
         
         if not admin_file.exists():
             return False
@@ -307,7 +309,7 @@ def password_reset():
 def verify_username_exists(username):
     """Check if the username exists in the admin file"""
     try:
-        admin_file = current_app.mail_config.base_dir / '.admin_user'
+        admin_file = current_app.mail_config.config_dir / '.admin_user'
         
         if not admin_file.exists():
             return False
@@ -339,8 +341,8 @@ def generate_password_reset_token(username):
             'used': False
         }
         
-        # Store token securely
-        token_file = current_app.mail_config.base_dir / f'.reset_token_{token[:8]}'
+        # Store token securely in config directory
+        token_file = current_app.mail_config.config_dir / f'.reset_token_{token[:8]}'
         
         # Encrypt token data
         encrypted_data = current_app.security_manager.encrypt_data(json.dumps(token_data))
@@ -359,8 +361,8 @@ def verify_token_exists(token):
         import time
         import json
         
-        # Find token file
-        token_file = current_app.mail_config.base_dir / f'.reset_token_{token[:8]}'
+        # Find token file in config directory
+        token_file = current_app.mail_config.config_dir / f'.reset_token_{token[:8]}'
         
         if not token_file.exists():
             return False
@@ -394,8 +396,8 @@ def verify_password_reset_token(token):
         import time
         import json
         
-        # Find token file
-        token_file = current_app.mail_config.base_dir / f'.reset_token_{token[:8]}'
+        # Find token file in config directory
+        token_file = current_app.mail_config.config_dir / f'.reset_token_{token[:8]}'
         
         if not token_file.exists():
             return None
@@ -437,8 +439,8 @@ def reset_admin_password(username, new_password):
         # Hash the new password
         hashed_password = current_app.security_manager.hash_user_password(new_password)
         
-        # Update admin credentials
-        admin_file = current_app.mail_config.base_dir / '.admin_user'
+        # Update admin credentials in config directory
+        admin_file = current_app.mail_config.config_dir / '.admin_user'
         admin_data = f"{username}:{hashed_password}"
         
         admin_file.write_text(admin_data)
@@ -459,7 +461,7 @@ def cleanup_reset_tokens():
         import time
         import json
         
-        token_files = list(current_app.mail_config.base_dir.glob('.reset_token_*'))
+        token_files = list(current_app.mail_config.config_dir.glob('.reset_token_*'))
         
         for token_file in token_files:
             try:

@@ -13,6 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from security import SecurityManager, SecureConfig
+from config import get_config
 import bcrypt
 
 
@@ -23,10 +24,12 @@ def main():
     print("=" * 60)
     print()
     
-    # Check if admin user exists
-    admin_file = Path('.admin_user')
+    # Get config and check if admin user exists
+    config = get_config()
+    admin_file = config.config_dir / '.admin_user'
     if not admin_file.exists():
         print("❌ Error: No admin user found.")
+        print(f"   Expected at: {admin_file}")
         print("   Run initial setup first to create an admin account.")
         return 1
     
@@ -82,7 +85,7 @@ def main():
         print()
         
         # Clean up any reset tokens
-        cleanup_reset_tokens()
+        cleanup_reset_tokens(config)
         
         return 0
         
@@ -91,10 +94,10 @@ def main():
         return 1
 
 
-def cleanup_reset_tokens():
+def cleanup_reset_tokens(config):
     """Clean up any existing reset tokens"""
     try:
-        token_files = list(Path('.').glob('.reset_token_*'))
+        token_files = list(config.config_dir.glob('.reset_token_*'))
         if token_files:
             print("🧹 Cleaning up old reset tokens...")
             for token_file in token_files:
