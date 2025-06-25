@@ -72,7 +72,8 @@ class SecurityManager:
                     keys_data = json.load(f)
                     key_b64 = keys_data.get('MASTER_KEY')
                     if key_b64:
-                        return base64.urlsafe_b64decode(key_b64)
+                        # Return the base64-encoded key directly (Fernet expects base64-encoded bytes)
+                        return key_b64.encode('utf-8')
         except Exception as e:
             print(f"Warning: Could not read generated keys file: {e}")
         
