@@ -401,7 +401,7 @@ async function loadBatchProcessingControls() {
     try {
         // Get system status to check for startup mode accounts (with timeout)
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
         
         const response = await fetch('/api/services/status', {
             signal: controller.signal
@@ -485,7 +485,7 @@ async function buildBatchProcessingControls(accounts) {
         try {
             // Add timeout to inbox count request
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout for IMAP operations
             
             const countResponse = await fetch(`/api/services/accounts/${encodeURIComponent(accountEmail)}/inbox-count`, {
                 signal: controller.signal
