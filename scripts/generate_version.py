@@ -15,15 +15,62 @@ from pathlib import Path
 def get_git_commit_count():
     """Get total commit count from git"""
     try:
+        # First try to get the commit count
         result = subprocess.run(
             ['git', 'rev-list', '--count', 'HEAD'],
             capture_output=True,
             text=True,
             check=True
         )
-        return int(result.stdout.strip())
+        count = int(result.stdout.strip())
+        
+        # If we get 1, it might be a shallow clone, try to get more history
+        if count <= 5:
+            # Try to unshallow the repo to get full history
+            try:
+                subprocess.run(
+                    ['git', 'fetch', '--unshallow'],
+                    capture_output=True,
+                    text=True,
+                    check=True
+                )
+                # Try again to get the count
+                result = subprocess.run(
+                    ['git', 'rev-list', '--count', 'HEAD'],
+                    capture_output=True,
+                    text=True,
+                    check=True
+                )
+                count = int(result.stdout.strip())
+            except (subprocess.CalledProcessError, ValueError):
+                # If unshallow fails, use a reasonable fallback based on version
+                try:
+                    script_dir = Path(__file__).parent.parent
+                    version_file = script_dir / "VERSION.txt"
+                    with open(version_file, 'r') as f:
+                        base_version = f.read().strip()
+                    if "0.3.3" in base_version:
+                        return 75  # Approximate build number for 0.3.3
+                    elif "0.3" in base_version:
+                        return 50  # Approximate build number for 0.3.x
+                except:
+                    pass
+                return count
+        
+        return count
     except (subprocess.CalledProcessError, ValueError, FileNotFoundError):
         # Fallback if git is not available or not in a git repo
+        try:
+            script_dir = Path(__file__).parent.parent
+            version_file = script_dir / "VERSION.txt"
+            with open(version_file, 'r') as f:
+                base_version = f.read().strip()
+            if "0.3.3" in base_version:
+                return 75  # Approximate build number for 0.3.3
+            elif "0.3" in base_version:
+                return 50  # Approximate build number for 0.3.x
+        except:
+            pass
         return 1
 
 def get_git_commit_hash():

@@ -554,7 +554,17 @@ def load_active_rules_for_account(account_email: str) -> List[EmailRule]:
         list: List of active Rule objects for the account
     """
     try:
-        manager = RulesEngine()
+        # Ensure we use the same persistent config directory as the web interface
+        rules_file = None
+        try:
+            from config import get_config
+            config = get_config()
+            rules_file = config.config_dir / "rules.json"
+        except Exception:
+            # Fallback if config unavailable
+            pass
+        
+        manager = RulesEngine(rules_file)
         rules = manager.get_all_rules()
         
         # Filter for active rules that apply to this account or all accounts (empty account_email)
