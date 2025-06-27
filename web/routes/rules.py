@@ -33,12 +33,11 @@ def login_required(f):
 
 
 def get_rules_engine():
-    """Get the rules engine instance"""
-    if not hasattr(current_app, 'rules_engine'):
-        # Use persistent config directory instead of base_dir
-        rules_file = current_app.mail_config.config_dir / 'rules.json'
-        current_app.rules_engine = RulesEngine(rules_file)
-    return current_app.rules_engine
+    """Get the rules engine instance - always reload to ensure fresh data"""
+    # Always create a fresh instance to avoid caching stale rules
+    # This ensures the web interface always shows the current state
+    rules_file = current_app.mail_config.config_dir / 'rules.json'
+    return RulesEngine(rules_file)
 
 
 def ensure_list_files_exist(rule):

@@ -315,7 +315,10 @@ class RulesEngine:
             self.rules = []
     
     def save_rules(self):
-        """Save rules to the rules file"""
+        """Save rules to the rules file using atomic write"""
+        import tempfile
+        import os
+        
         rules_data = []
         for rule in self.rules:
             rule_dict = asdict(rule)
@@ -325,9 +328,33 @@ class RulesEngine:
             for action in rule_dict['actions']:
                 action['type'] = action['type'].value
             rules_data.append(rule_dict)
+        
+        # Use atomic write: write to temp file, then rename
+        # This prevents other processes from reading a partially written file
+        temp_file = None
+        try:
+            # Create temp file in same directory as target file
+            temp_fd, temp_file = tempfile.mkstemp(
+                suffix='.tmp',
+                prefix='rules_',
+                dir=self.rules_file.parent
+            )
             
-        with open(self.rules_file, 'w') as f:
-            json.dump(rules_data, f, indent=2)
+            with os.fdopen(temp_fd, 'w') as f:
+                json.dump(rules_data, f, indent=2)
+            
+            # Atomic rename
+            os.rename(temp_file, self.rules_file)
+            temp_file = None  # Successfully renamed, don't delete
+            
+        except Exception as e:
+            # Clean up temp file if something went wrong
+            if temp_file and os.path.exists(temp_file):
+                try:
+                    os.unlink(temp_file)
+                except:
+                    pass
+            raise e
     
     def add_rule(self, rule: EmailRule):
         """Add a new rule"""
