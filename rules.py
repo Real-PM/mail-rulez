@@ -250,7 +250,17 @@ class RulesEngine:
     """Main rules engine for processing emails"""
     
     def __init__(self, rules_file: Path = None):
-        self.rules_file = rules_file or Path("rules.json")
+        if rules_file is None:
+            # Store rules in the persistent config directory
+            try:
+                from config import get_config
+                config = get_config()
+                self.rules_file = config.config_dir / "rules.json"
+            except Exception:
+                # Fallback to current directory if config unavailable
+                self.rules_file = Path("rules.json")
+        else:
+            self.rules_file = rules_file
         self.rules: List[EmailRule] = []
         self.load_rules()
     
