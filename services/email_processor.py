@@ -515,8 +515,8 @@ class EmailProcessor:
             batch_size = 100  # Process 100 messages at a time in startup mode
             self.logger.info(f"Starting inbox processing for {self.account_config.email} (batch size: {batch_size})")
             
-            # TODO: Execute rules first (needs proper integration)
-            # self._execute_rules()
+            # Execute rules first
+            self._execute_rules()
             
             # Process inbox with startup logic and batch limit
             result = pi.process_inbox(self.account, limit=batch_size)
@@ -642,8 +642,8 @@ class EmailProcessor:
             start_time = time.time()
             batch_size = 200  # Process 200 messages at a time in maintenance mode
             
-            # TODO: Execute rules first (needs proper integration)
-            # self._execute_rules()
+            # Execute rules first
+            self._execute_rules()
             
             # Process inbox with maintenance logic and batch limit
             result = pi.process_inbox_maint(self.account, limit=batch_size)

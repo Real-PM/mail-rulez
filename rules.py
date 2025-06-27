@@ -150,6 +150,101 @@ class EmailRule:
             # Default to AND logic
             return all(condition.matches(email_data) for condition in self.conditions)
 
+    def process_emails(self, account, folder="INBOX", limit=None):
+        """
+        Process emails in the specified folder against this rule
+        
+        Args:
+            account: Account object with IMAP connection
+            folder: IMAP folder to process (default: INBOX)  
+            limit: Maximum number of emails to process
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        try:
+            # Connect to IMAP
+            mb = account.login()
+            if not mb:
+                logger.error(f"Failed to connect to IMAP for account {account.email}")
+                return 0
+                
+            mb.folder.set(folder)
+            
+            # Fetch emails using existing function
+            import functions as pf
+            mail_list = pf.fetch_class(mb, folder=folder, limit=limit)
+            
+            processed_count = 0
+            logger.info(f"Rule '{self.name}' processing {len(mail_list)} emails from {folder}")
+            
+            # Process each email
+            for mail_item in mail_list:
+                # Convert to format expected by rule conditions
+                email_data = {
+                    'from': mail_item.from_,
+                    'subject': mail_item.subject,
+                    'content': '',  # Would need full body for content rules
+                    'date': mail_item.date
+                }
+                
+                # Check if rule matches
+                if self.matches(email_data):
+                    logger.info(f"Rule '{self.name}' matched email from {mail_item.from_} with subject '{mail_item.subject}'")
+                    # Execute all actions for this rule
+                    for action in self.actions:
+                        self._execute_action(action, mail_item, mb, account)
+                    processed_count += 1
+            
+            mb.logout()
+            logger.info(f"Rule '{self.name}' processed {processed_count} matching emails")
+            return processed_count
+            
+        except Exception as e:
+            logger.error(f"Error processing emails for rule {self.id}: {e}")
+            if 'mb' in locals() and mb:
+                try:
+                    mb.logout()
+                except:
+                    pass
+            return 0
+
+    def _execute_action(self, action, mail_item, mailbox, account):
+        """Execute a single rule action on an email"""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        try:
+            if action.type == ActionType.MOVE_TO_FOLDER:
+                logger.info(f"Moving email UID {mail_item.uid} to folder {action.target}")
+                # Use existing move logic with Gmail support
+                import functions as pf
+                if pf.is_gmail_account(account.email):
+                    pf.gmail_aware_move(mailbox, [mail_item.uid], action.target)
+                else:
+                    mailbox.move([mail_item.uid], action.target)
+                    
+            elif action.type == ActionType.ADD_TO_LIST:
+                # Extract email address and add to list
+                sender_email = mail_item.from_
+                if '<' in sender_email and '>' in sender_email:
+                    sender_email = sender_email.split('<')[1].split('>')[0].strip()
+                
+                logger.info(f"Adding {sender_email} to {action.target} list")
+                import functions as pf
+                # Add to specified list file
+                pf.new_entries(action.target, [sender_email])
+                
+            elif action.type == ActionType.MARK_READ:
+                logger.info(f"Marking email UID {mail_item.uid} as read")
+                # Mark email as read
+                mailbox.flag([mail_item.uid], ['\\Seen'], True)
+                
+            # Additional action types would be implemented here
+            
+        except Exception as e:
+            logger.error(f"Error executing action {action.type} for rule {self.id}: {e}")
+
 
 class RulesEngine:
     """Main rules engine for processing emails"""
