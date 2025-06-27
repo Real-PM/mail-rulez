@@ -46,11 +46,15 @@ def overview():
     # Get account stats
     account_stats = get_account_stats()
     
+    # Get service mode information
+    service_info = get_service_info()
+    
     return render_template('dashboard/overview.html',
                          stats=stats,
                          processing_stats=processing_stats,
                          recent_activity=recent_activity,
-                         account_count=account_stats.get('active_accounts', 0))
+                         account_count=account_stats.get('active_accounts', 0),
+                         service_info=service_info)
 
 
 @dashboard_bp.route('/api/stats')
@@ -377,3 +381,58 @@ def get_uptime():
             return f"{minutes}m"
     except Exception:
         return "Unknown"
+
+
+def get_service_info():
+    """Get service mode and status information"""
+    try:
+        from services.task_manager import get_task_manager
+        task_manager = get_task_manager()
+        status = task_manager.get_all_status()
+        
+        # Determine overall service mode
+        modes = []
+        startup_accounts = 0
+        maintenance_accounts = 0
+        
+        if status.get('success') and status.get('data', {}).get('accounts'):
+            for account_email, account_data in status['data']['accounts'].items():
+                if account_data and account_data.get('mode'):
+                    mode = account_data['mode']
+                    modes.append(mode)
+                    if mode == 'startup':
+                        startup_accounts += 1
+                    elif mode == 'maintenance':
+                        maintenance_accounts += 1
+        
+        # Determine primary mode
+        if startup_accounts > 0 and maintenance_accounts == 0:
+            primary_mode = "Startup"
+            mode_description = "Manual Processing"
+        elif maintenance_accounts > 0 and startup_accounts == 0:
+            primary_mode = "Maintenance"
+            mode_description = "Automatic Processing"
+        elif startup_accounts > 0 and maintenance_accounts > 0:
+            primary_mode = "Mixed"
+            mode_description = f"{startup_accounts} Startup, {maintenance_accounts} Maintenance"
+        else:
+            primary_mode = "Setup"
+            mode_description = "No accounts configured"
+        
+        return {
+            'mode': primary_mode,
+            'description': mode_description,
+            'startup_accounts': startup_accounts,
+            'maintenance_accounts': maintenance_accounts,
+            'total_accounts': startup_accounts + maintenance_accounts
+        }
+        
+    except Exception as e:
+        current_app.logger.error(f"Error getting service info: {e}")
+        return {
+            'mode': "Unknown",
+            'description': "Status unavailable",
+            'startup_accounts': 0,
+            'maintenance_accounts': 0,
+            'total_accounts': 0
+        }

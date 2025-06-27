@@ -81,7 +81,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="text-white-75 small">Service Mode</div>
-                            <div class="text-lg fw-bold">{{ "Startup" if account_count > 0 else "Setup" }}</div>
+                            <div class="text-lg fw-bold">{{ service_info.mode }}</div>
                         </div>
                         <div class="align-self-center">
                             <i class="bi bi-gear fs-1"></i>
@@ -141,6 +141,7 @@
                                 <li><i class="bi bi-1-circle text-primary"></i> <a href="{{ url_for('accounts.list_accounts') }}">Configure email accounts</a></li>
                                 <li><i class="bi bi-2-circle text-primary"></i> <a href="{{ url_for('lists.manage_lists') }}">Set up your lists</a></li>
                                 <li><i class="bi bi-3-circle text-primary"></i> <a href="{{ url_for('rules.list_rules') }}">Create processing rules</a></li>
+                                <li><i class="bi bi-book text-primary"></i> <a href="https://docs.mail-rulez.com" target="_blank">View documentation</a></li>
                             </ul>
                         </div>
                         <div class="col-md-6">
@@ -148,7 +149,7 @@
                             <ul class="list-unstyled">
                                 <li><i class="bi bi-server"></i> Service: Mail-Rulez v{{ version }}</li>
                                 <li><i class="bi bi-shield-check"></i> Security: Encrypted storage</li>
-                                <li><i class="bi bi-gear"></i> Mode: {{ "Startup (Manual)" if account_count > 0 else "Setup Required" }}</li>
+                                <li><i class="bi bi-gear"></i> Mode: {{ service_info.description }}</li>
                             </ul>
                         </div>
                     </div>
