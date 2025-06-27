@@ -20,10 +20,11 @@ from logging_config import setup_for_environment, get_logger
 
 # Import version information
 try:
-    from version import __version__, __build_date__, __commit_hash__
+    from version import __version__, __base_version__, __build_date__, __commit_hash__
 except ImportError:
     # Fallback if version.py doesn't exist
     __version__ = "0.0.0-dev"
+    __base_version__ = "0.0.0"
     __build_date__ = "unknown"
     __commit_hash__ = "unknown"
 
@@ -76,7 +77,7 @@ def create_app(config_dir=None, testing=False):
     def inject_globals():
         return {
             'app_name': 'Mail-Rulez',
-            'version': __version__,
+            'version': __base_version__,
             'build_date': __build_date__,
             'commit_hash': __commit_hash__,
             'current_user': get_current_user(),
